@@ -3,9 +3,9 @@
 
 	<Resource name="jdbc/server/restaurant" type="javax.sql.DataSource"
 		driverClassName="com.mysql.cj.jdbc.Driver"
-		jdbcUrl="jdbc:mysql://Localhost:3306/demo_test"
+		jdbcUrl="jdbc:mysql://34.72.67.67:3306/foodhunter"
 		username="root"
-		password="andy0604"
+		password="0000"
 		factory="com.zaxxer.hikari.HikariJNDIFactory"
 		dataSource.cachePrepStmts="true"
 		dataSource.prepStmtCacheSize="250"
