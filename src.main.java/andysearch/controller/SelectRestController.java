@@ -45,7 +45,7 @@ public class SelectRestController extends HttpServlet {
 			for(Restaurant rest : restaurants) {
 				JsonObject respBody = new JsonObject();
 				respBody.addProperty("restaurant_id", rest.getRestaurantId());
-				respBody.addProperty("restaurant_name", rest.getRestaurantName());
+				respBody.addProperty("name", rest.getRestaurantName());
 				respBody.addProperty("address", rest.getAddress());
 				respBody.addProperty("latitude", rest.getLatitude());
 				respBody.addProperty("longitude", rest.getLongitude());

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+	<Resource name="jdbc/server/restaurant" type="javax.sql.DataSource"
+		driverClassName="com.mysql.cj.jdbc.Driver"
+		jdbcUrl="jdbc:mysql://Localhost:3306/demo_test"
+		username="root"
+		password="andy0604"
+		factory="com.zaxxer.hikari.HikariJNDIFactory"
+		dataSource.cachePrepStmts="true"
+		dataSource.prepStmtCacheSize="250"
+		dataSource.prepStmtCacheSqlLimit="2048"
+	/>
+
+</Context>
