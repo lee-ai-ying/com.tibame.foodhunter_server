@@ -33,8 +33,7 @@ public class RestaurantServiceImpl implements RestaurantService{
 			return null;
 		}
 		
-		return restaurantDao.selectByRestaurantNameOrLabel(restaurant);
-		
+		return restaurantDao.selectByRestaurantNameOrLabel(restaurant);	
 	}
 
 	@Override

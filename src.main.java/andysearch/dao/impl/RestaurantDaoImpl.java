@@ -91,7 +91,5 @@ public class RestaurantDaoImpl implements RestaurantDao{
 		}
 		return new ArrayList<>();
 	}
-
-	
 }
 

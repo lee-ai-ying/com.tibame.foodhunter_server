@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.Gson;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -26,13 +26,13 @@ public class PreLoadRest extends HttpServlet {
 
 
 	@Override
-		public void init() throws ServletException {
-			try {
-				service = new RestaurantServiceImpl();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	public void init() throws ServletException {
+		try {
+			service = new RestaurantServiceImpl();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+	}
 
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
