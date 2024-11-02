@@ -36,6 +36,7 @@ public class SelectRestController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Gson gson = new Gson();
+		req.setCharacterEncoding("UTF-8");
 		Restaurant restaurant = gson.fromJson(req.getReader(), Restaurant.class);
 		
 		List<Restaurant> restaurants = service.selectRest(restaurant);

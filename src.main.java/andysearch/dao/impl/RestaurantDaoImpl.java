@@ -17,7 +17,7 @@ public class RestaurantDaoImpl implements RestaurantDao{
 	private DataSource ds;
 
 	public RestaurantDaoImpl() throws NamingException {
-		ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/server/restaurant");
+		ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/server/foodhunter");
 	}
 	@Override
 	public List<Restaurant> selectByRestaurantNameOrLabel(Restaurant restaurant) {
@@ -53,7 +53,7 @@ public class RestaurantDaoImpl implements RestaurantDao{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return new ArrayList<>();
 	}
 	
 	
