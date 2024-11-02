@@ -17,7 +17,12 @@ private String email;
 private String gender;
 private Timestamp birthday;
 
-
+public Integer getId() {
+	return id;
+}
+public void setId(Integer id) {
+	this.id = id;
+}
 
 
 public Timestamp getRegistrationdate() {
@@ -56,12 +61,7 @@ public String getcPassword() {
 public void setcPassword(String cPassword) {
 	this.cPassword = cPassword;
 }
-public Integer getId() {
-	return id;
-}
-public void setId(Integer id) {
-	this.id = id;
-}
+
 public String getUsername() {
 	return username;
 }

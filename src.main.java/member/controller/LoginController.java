@@ -29,13 +29,17 @@ public class LoginController  extends HttpServlet {
 		
 		@Override
 		protected void doPost(HttpServletRequest req,HttpServletResponse resp) throws ServletException, IOException{
+			req.setCharacterEncoding("UTF-8");
 			Gson gson =new Gson();
 			Member member = gson.fromJson(req.getReader(),Member.class);
 			member =service.login(member);
-			
+			System.out.println(member);
 			JsonObject respBody = new JsonObject();
+			boolean logged = false;
 			if(member != null) {
+			logged = true;
 			respBody.addProperty("nickname",member.getNickname());
+			respBody.addProperty("logged", logged);
 			if (req.getSession(false) != null) {
 				req.changeSessionId(); // ←變更Session ID
 				} // ↓此屬性物件即用來區分是否登入中
@@ -43,6 +47,8 @@ public class LoginController  extends HttpServlet {
 			}else {
 				respBody.addProperty("errMsg","使用者名稱或密碼錯誤");
 			}
+			resp.setCharacterEncoding("UTF-8");
 			resp.getWriter().write(respBody.toString());
+			
 		}
 }

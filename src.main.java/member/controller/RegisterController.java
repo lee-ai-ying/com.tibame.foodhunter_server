@@ -36,7 +36,7 @@ protected void doPost(HttpServletRequest req,HttpServletResponse resp) throws Se
 	String errMsg = service.register(member);
 	JsonObject respBody = new JsonObject();
 	respBody.addProperty("result",errMsg == null);
-	respBody.addProperty("errMsg", errMsg == "註冊成功");
+	respBody.addProperty("errMsg", errMsg);
 	resp.setCharacterEncoding("UTF-8");
 	resp.getWriter().write(respBody.toString());
 	

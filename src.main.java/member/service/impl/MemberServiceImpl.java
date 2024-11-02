@@ -68,19 +68,35 @@ memberDao = new MemberDaoImpl();
 	}
 	@Override
 	public String save(Member member) {
-		Integer id = member.getId();
-		if(id== null) {
-			return "無此會員";
-		}
+		
 		String password = member.getPassword();
-		if(password== null || password.isEmpty()) {
-			return "必須輸入密碼";
+		if(password == null ||password.length()<6 ||password.length()>12) {
+			return "密碼長度必須介於6-12";
 		}
 		
+		
 		String nickname = member.getNickname();
-		if(nickname== null || nickname.isEmpty()) {
-			return "必須輸入暱稱";
+		if(nickname == null ||nickname.length()<1 ||nickname.length()>20) {
+			return "暱稱名稱長度必須介於1-20";
+		}		
+			
+		
+		String email = member.getEmail();
+		if(memberDao.selectByUsername("email",email) != null) {
+			return "此信箱名稱已被註冊";
+			}
+		String phone = member.getPhone();
+		if(memberDao.selectByUsername("phone",phone) != null) {
+			return "此號碼已被註冊";
+			}
+		if(phone.length() != 10) {
+			return "請輸入正確的手機號碼";
 		}
+		
+		
+		
+		
+		
 		int result = memberDao.updateById(member);
 		
 		return result>0 ? null :"編輯錯誤";

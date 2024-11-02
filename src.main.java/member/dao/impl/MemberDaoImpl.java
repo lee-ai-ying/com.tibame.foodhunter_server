@@ -66,21 +66,21 @@ public class MemberDaoImpl implements MemberDao {
 
 	@Override
 	public Member selectByUsernameAndPassword(Member member) {
-		String sql = "select * from MEMBER where  USERNAME = ? and PASSWORD = ?";
+		String sql = "select * from member where  username = ? and password = ?";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, member.getUsername());
 			pstmt.setString(2, member.getPassword());
 			try (ResultSet rs = pstmt.executeQuery()) {
 				if (rs.next()) {
-					member = new Member();
-					member.setId(rs.getInt("ID"));
-					member.setUsername(rs.getString("USERNAME"));
-					member.setPassword(rs.getString("PASSWORD"));
-					member.setNickname(rs.getString("NICKNAME"));
-					member.setPass(rs.getBoolean("PASS"));
-					member.setCreator(rs.getString("CREATOR"));
-
-					member.setUpdater(rs.getString("UPDATER"));
+					member.setId(rs.getInt("member_id"));
+					member.setUsername(rs.getString("username"));
+					member.setPassword(rs.getString("password"));
+					member.setNickname(rs.getString("nickname"));
+					member.setEmail(rs.getString("email"));
+					member.setPhone(rs.getString("phone"));
+					member.setRegistrationdate(rs.getTimestamp("registrationdate"));
+					member.setGender(rs.getString("gender"));
+					member.setBirthday(rs.getTimestamp("birthday"));
 					return member;
 				}
 			}
@@ -92,12 +92,14 @@ public class MemberDaoImpl implements MemberDao {
 
 	@Override
 	public int updateById(Member member) {
-		String sql = "update MEMBER "+"set"+" PASSWORD = ?,"+" NICKNAME = ?"+" where ID = ?";
+		String sql = "update member "+"set"+" password = ?,"+" nickname = ?"+" email = ?"+" phone = ?"+" where username = ?";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			
 			pstmt.setString(1, member.getPassword());
 			pstmt.setString(2, member.getNickname());
-			pstmt.setInt(3, member.getId());
+			pstmt.setString(3, member.getEmail());
+			pstmt.setString(4, member.getPhone());
+			pstmt.setString(5, member.getUsername());
 			return pstmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
