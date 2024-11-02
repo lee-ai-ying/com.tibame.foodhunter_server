@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/HikariCP-6.0.0.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/mysql-connector-j-8.4.0.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/slf4j-api-1.7.36.jar"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/gson-2.8.9.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
