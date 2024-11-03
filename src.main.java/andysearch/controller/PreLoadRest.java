@@ -41,26 +41,31 @@ public class PreLoadRest extends HttpServlet {
 		List<Restaurant> restaurants = service.preLoadRestService();
 		
 		JsonArray restaurantArray = new JsonArray();
-		if (restaurants != null) {
-			for(Restaurant rest : restaurants) {
-				JsonObject respBody = new JsonObject();
-				respBody.addProperty("restaurant_id", rest.getRestaurantId());
-				respBody.addProperty("name", rest.getRestaurantName());
-				respBody.addProperty("address", rest.getAddress());
-				respBody.addProperty("latitude", rest.getLatitude());
-				respBody.addProperty("longitude", rest.getLongitude());
-				restaurantArray.add(respBody);
+		try {
+			if (restaurants != null) {
+				for(Restaurant rest : restaurants) {
+					JsonObject respBody = new JsonObject();
+					respBody.addProperty("restaurant_id", rest.getRestaurantId());
+					respBody.addProperty("name", rest.getRestaurantName());
+					respBody.addProperty("address", rest.getAddress());
+					respBody.addProperty("latitude", rest.getLatitude());
+					respBody.addProperty("longitude", rest.getLongitude());
+					restaurantArray.add(respBody);
+				}
+		
+			} else {
+	            JsonObject notFound = new JsonObject();
+	            notFound.addProperty("NotFind", "查無此餐廳");
+	            restaurantArray.add(notFound); //
 			}
-	
-		} else {
-            JsonObject notFound = new JsonObject();
-            notFound.addProperty("NotFind", "查無此餐廳");
-            restaurantArray.add(notFound); //
+	        response.setContentType("application/json");
+	        response.setCharacterEncoding("UTF-8");
+	        response.getWriter().write(restaurantArray.toString()); 
+	        System.out.println(restaurantArray);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(restaurantArray.toString()); 
-        System.out.println(restaurantArray);
+
 	}
 
 }

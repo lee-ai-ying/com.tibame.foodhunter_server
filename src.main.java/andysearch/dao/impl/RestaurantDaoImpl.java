@@ -20,23 +20,41 @@ public class RestaurantDaoImpl implements RestaurantDao{
 		ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/server/foodhunter");
 	}
 	@Override
-	public List<Restaurant> selectByRestaurantNameOrLabel(Restaurant restaurant) {
+	public List<Restaurant> selectByKeywordsAndPrice(List<String> labels, Integer price) {
 	
-		String sql = "select * from restaurant where restaurant_name like ? or restaurant_label like ?";
-	
-		try (
+		StringBuilder sql = new StringBuilder("select * from restaurant where");
+		List<String> conditions = new ArrayList<>();
+		for (String label: labels) {
+			conditions.add("(restaurant_name like ? OR restaurant_label like ?)");
+		}
+		
+		if (price != null) {
+			conditions.add("(price_range_min <= ? AND price_range_max >= ?)");
+		}
+		sql.append(String.join("and", conditions));
+		
+		try ( 
 			Connection conn = ds.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql)
+			PreparedStatement pstmt = conn.prepareStatement(sql.toString())
 		){
+			int index = 1;
+			for (String label: labels) {
+				String keyword = "%" + label + "%";
+				pstmt.setString(index++, keyword); // name
+				pstmt.setString(index++, keyword); // label
+			}
+			if (price != null) {
+				pstmt.setInt(index++, price);
+				pstmt.setInt(index++, price);
+			}
 			List<Restaurant> results = new ArrayList<>();
-			pstmt.setString(1, "%" + restaurant.getRestaurantName() + "%");
-			pstmt.setString(2, "%" + restaurant.getRestaurantLabel() + "%");
 			try (ResultSet rs = pstmt.executeQuery()){
 				while (rs.next()) {
 					Restaurant rest = new Restaurant();
 					rest.setRestaurantId(rs.getInt("restaurant_id"));
 					rest.setRestaurantName(rs.getString("restaurant_name"));
 					rest.setAddress(rs.getString("address"));
+					rest.setRestaurantLabel(rs.getString("restaurant_label"));
 					rest.setTotalScores(rs.getInt("total_scores"));
 					rest.setTotalReview(rs.getInt("total_review"));
 					rest.setLatitude(rs.getDouble("latitude"));
@@ -91,5 +109,7 @@ public class RestaurantDaoImpl implements RestaurantDao{
 		}
 		return new ArrayList<>();
 	}
+	
+	
 }
 

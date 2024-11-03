@@ -1,5 +1,6 @@
 package andysearch.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -17,23 +18,24 @@ public class RestaurantServiceImpl implements RestaurantService{
 		restaurantDao = new RestaurantDaoImpl();
 	}
 
-	// TODO 以全名/名稱(不一定全名)搜尋
-		
-	// TODO 以關鍵字搜尋
-	// TODO 以距離搜尋
-	// TODO 以時間搜尋
-	// TODO 以價格搜尋
 	
 
 	@Override
-	public List<Restaurant>  selectRest(Restaurant restaurant) {
-		String restname = restaurant.getRestaurantName();
-
-		if (restname == null || restname.isEmpty()) {
-			return null;
+	public List<Restaurant> selectRest(String searchtext) {
+		String[] keywords = searchtext.split(" ");
+		Integer price = null;
+		List<String> labels = new ArrayList<>();
+		
+		for (String keyword: keywords) {
+			if (isNumeric(keyword)) {
+				price = Integer.parseInt(keyword);
+			} else {
+				labels.add(keyword);
+			}
 		}
 		
-		return restaurantDao.selectByRestaurantNameOrLabel(restaurant);	
+		
+		return restaurantDao.selectByKeywordsAndPrice(labels, price);	
 	}
 
 	@Override
@@ -42,4 +44,14 @@ public class RestaurantServiceImpl implements RestaurantService{
 		return restaurantDao.preLoadRestaurant();
 	}
 
+	
+	// 判斷是否為數字
+	private boolean isNumeric(String str) {
+	    try {
+	        Integer.parseInt(str);
+	        return true;
+	    } catch (NumberFormatException e) {
+	        return false;
+	    }
+	}
 }

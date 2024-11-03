@@ -16,6 +16,7 @@ public class Restaurant {
     private Integer priceRangeMin;
     private String email;
     private Integer serviceCharge;
+    private String searchText;
 
     // Constructors
     public Restaurant() {}
@@ -173,4 +174,12 @@ public class Restaurant {
                 ", serviceCharge=" + serviceCharge +
                 '}';
     }
+
+	public String getSearchText() {
+		return searchText;
+	}
+
+	public void setSearchText(String searchText) {
+		this.searchText = searchText;
+	}
 }
