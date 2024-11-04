@@ -12,13 +12,11 @@ public class Post {
     private Timestamp postTime;    // 建立時間
     private Integer visibility;    // 可見性
     private Integer restaurantId;  // 餐廳編號
-<<<<<<< HEAD
     private Integer likeCount;     // 按讚總數
-=======
-    private Integer likeCount; 
+
     private String publisherNickname;
     private String restaurantName; 
->>>>>>> Zoe
+
 
     // 預設建構函數
     public Post() {
