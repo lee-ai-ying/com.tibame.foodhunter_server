@@ -59,3 +59,4 @@ public interface PostService {
 	    List<Post> getPostsByUserId(Long userId);
 
 	}
+
