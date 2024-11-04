@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-import zoe.service.impl.CommentServiceImpl;
+
+import zoe.service.Impl.CommentServiceImpl;
 import zoe.vo.Comment;
 
 @WebServlet("/comment/create")

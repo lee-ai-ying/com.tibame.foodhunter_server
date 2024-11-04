@@ -1,4 +1,4 @@
-package zoe.service.impl;
+package zoe.service.Impl;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -6,7 +6,7 @@ import javax.naming.NamingException;
 import zoe.service.CommentService;
 
 import zoe.dao.CommentDao;
-import zoe.dao.impl.CommentDaoImpl;
+import zoe.dao.Impl.CommentDaoImpl;
 import zoe.vo.Comment;
 
 public class CommentServiceImpl implements CommentService {

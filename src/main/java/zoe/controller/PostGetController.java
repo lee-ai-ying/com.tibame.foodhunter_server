@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import zoe.service.PostService;
-import zoe.service.impl.PostServiceImpl;
+import zoe.service.Impl.PostServiceImpl;
 import zoe.vo.Post;
 
 @WebServlet("/post/get")

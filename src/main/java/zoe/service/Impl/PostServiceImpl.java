@@ -1,4 +1,4 @@
-package zoe.service.impl;
+package zoe.service.Impl;
 
 
 import java.sql.Connection;
@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.naming.NamingException;
 import zoe.dao.PostDao;
-import zoe.dao.impl.PostDaoImpl;
+import zoe.dao.Impl.PostDaoImpl;
 import zoe.vo.Post;
 import zoe.service.PostService;
 

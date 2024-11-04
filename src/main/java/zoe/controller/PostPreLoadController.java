@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 
 import com.google.gson.Gson;
 import zoe.service.PostService;
-import zoe.service.impl.PostServiceImpl;
+import zoe.service.Impl.PostServiceImpl;
 import zoe.vo.Post;
 
 @WebServlet("/post/preLoad")
