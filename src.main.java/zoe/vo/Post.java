@@ -112,22 +112,7 @@ public class Post {
         this.likeCount = likeCount;
     }
 
-<<<<<<< HEAD
-    @Override
-    public String toString() {
-        return "Post{" +
-                "postId=" + postId +
-                ", postTag='" + postTag + '\'' +
-                ", publisher=" + publisher +
-                ", content='" + content + '\'' +
-                ", messageTime=" + messageTime +
-                ", postTime=" + postTime +
-                ", visibility=" + visibility +
-                ", restaurantId=" + restaurantId +
-                ", likeCount=" + likeCount +
-                '}';
-    }
-=======
+
 
     public String getPublisherNickname() {
         return publisherNickname;
@@ -139,5 +124,5 @@ public class Post {
     
     public String getRestaurantName() { return restaurantName; }
     public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }
->>>>>>> Zoe
+
 }

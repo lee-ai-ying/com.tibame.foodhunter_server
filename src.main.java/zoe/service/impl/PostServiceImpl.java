@@ -1,25 +1,6 @@
 package zoe.service.impl;
 
-<<<<<<< HEAD
-import java.util.List;
-import javax.naming.NamingException;
-import zoe.dao.PostDao;
-import zoe.dao.impl.PostDaoImpl; // 加入 PostDaoImpl 的 import
-import zoe.vo.Post; // 加入 Post 類別的 import
-import zoe.service.PostService; // 加入 PostService 介面的 import
 
-public class PostServiceImpl implements PostService {
-    
-    private PostDao postDao;
-    
-    public PostServiceImpl() throws NamingException {
-              postDao = new PostDaoImpl();
-    }
-    
-    @Override
-    public List<Post> preLoadPosts() {
-        return postDao.preLoadPost();
-=======
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.naming.NamingException;
 import zoe.dao.PostDao;
+import zoe.dao.impl.PostDaoImpl;
 import zoe.vo.Post;
 import zoe.service.PostService;
 
@@ -34,7 +16,7 @@ public class PostServiceImpl implements PostService {
     private PostDao postDao;
 
     public PostServiceImpl() throws NamingException {
-        postDao = new zoe.dao.Impl.PostDaoImpl();
+        postDao = new PostDaoImpl();
     }
 
     @Override
@@ -117,6 +99,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getPostsByUserId(Long userId) {
         throw new UnsupportedOperationException("Not implemented yet");
->>>>>>> Zoe
+
     }
 }

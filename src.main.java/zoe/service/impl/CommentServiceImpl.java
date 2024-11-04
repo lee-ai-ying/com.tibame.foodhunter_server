@@ -6,7 +6,7 @@ import javax.naming.NamingException;
 import zoe.service.CommentService;
 
 import zoe.dao.CommentDao;
-import zoe.dao.Impl.CommentDaoImpl;
+import zoe.dao.impl.CommentDaoImpl;
 import zoe.vo.Comment;
 
 public class CommentServiceImpl implements CommentService {
