@@ -1,5 +1,6 @@
 package zoe.service.impl;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.naming.NamingException;
 import zoe.dao.PostDao;
+import zoe.dao.impl.PostDaoImpl;
 import zoe.vo.Post;
 import zoe.service.PostService;
 
@@ -14,7 +16,7 @@ public class PostServiceImpl implements PostService {
     private PostDao postDao;
 
     public PostServiceImpl() throws NamingException {
-        postDao = new zoe.dao.Impl.PostDaoImpl();
+        postDao = new PostDaoImpl();
     }
 
     @Override
@@ -97,5 +99,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getPostsByUserId(Long userId) {
         throw new UnsupportedOperationException("Not implemented yet");
+
     }
 }
