@@ -39,10 +39,15 @@ public class SelectRestController extends HttpServlet {
 		req.setCharacterEncoding("UTF-8");
 		Restaurant restaurant = gson.fromJson(req.getReader(), Restaurant.class);
 		
-		List<Restaurant> restaurants = service.selectRest(restaurant);
+		List<Restaurant> restaurants = service.selectRest(restaurant.getSearchText());
 		
 		JsonArray restaurantArray = new JsonArray();
-		if (restaurants != null) {
+		if (restaurants == null || restaurants.isEmpty()) {
+            JsonObject notFound = new JsonObject();
+            notFound.addProperty("NotFind", "查無此餐廳");
+            restaurantArray.add(notFound); //
+
+		} else {
 			for(Restaurant rest : restaurants) {
 				JsonObject respBody = new JsonObject();
 				respBody.addProperty("restaurant_id", rest.getRestaurantId());
@@ -50,13 +55,9 @@ public class SelectRestController extends HttpServlet {
 				respBody.addProperty("address", rest.getAddress());
 				respBody.addProperty("latitude", rest.getLatitude());
 				respBody.addProperty("longitude", rest.getLongitude());
+				respBody.addProperty("label", rest.getRestaurantLabel());
 				restaurantArray.add(respBody);
 			}
-	
-		} else {
-            JsonObject notFound = new JsonObject();
-            notFound.addProperty("NotFind", "查無此餐廳");
-            restaurantArray.add(notFound); //
 		}
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");

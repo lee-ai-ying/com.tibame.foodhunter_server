@@ -59,13 +59,7 @@ public class PreLoadRest extends HttpServlet {
 		} catch (Exception e) {
 		    // 當捕捉到例外時，restaurantArray 將保持為空的 JsonArray
 		    e.printStackTrace(); // 可選擇保留或移除這行，用於記錄錯誤
-		} finally {
-		    response.setContentType("application/json");
-		    response.setCharacterEncoding("UTF-8");
-		    response.getWriter().write(restaurantArray.toString());
-		    System.out.println(restaurantArray);
 		}
-
 	}
 
 }
