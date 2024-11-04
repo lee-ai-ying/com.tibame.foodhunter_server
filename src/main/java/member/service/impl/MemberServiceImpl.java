@@ -66,6 +66,13 @@ memberDao = new MemberDaoImpl();
 		
 		return memberDao.selectByUsernameAndPassword(member);
 	}
+	
+	@Override
+	public Member getinfo(Member member) {
+
+		return memberDao.selectByUserdata(member);
+	}
+	
 	@Override
 	public String save(Member member) {
 		
@@ -101,4 +108,5 @@ memberDao = new MemberDaoImpl();
 		
 		return result>0 ? null :"編輯錯誤";
 	}
+	
 }

@@ -106,4 +106,29 @@ public class MemberDaoImpl implements MemberDao {
 		}
 		return -1;
 	}
+
+	@Override
+	public Member selectByUserdata(Member member) {
+		String sql = "select * from member where  username = ?";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, member.getUsername());
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					member.setId(rs.getInt("member_id"));
+					member.setUsername(rs.getString("username"));
+					member.setPassword(rs.getString("password"));
+					member.setNickname(rs.getString("nickname"));
+					member.setEmail(rs.getString("email"));
+					member.setPhone(rs.getString("phone"));
+					member.setRegistrationdate(rs.getTimestamp("registrationdate"));
+					member.setGender(rs.getString("gender"));
+					member.setBirthday(rs.getTimestamp("birthday"));
+					return member;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

@@ -30,13 +30,18 @@ private MemberService service;
 @Override
 protected void doPost(HttpServletRequest req,HttpServletResponse resp) throws ServletException, IOException{
 	req.setCharacterEncoding("UTF-8");
-	
+	boolean registered = false;
 	Gson gson =new Gson();
 	Member member = gson.fromJson(req.getReader(),Member.class);
 	String errMsg = service.register(member);
 	JsonObject respBody = new JsonObject();
 	respBody.addProperty("result",errMsg == null);
 	respBody.addProperty("errMsg", errMsg);
+	if(errMsg == null) {
+		registered = true;
+	respBody.addProperty("registered", registered);
+
+	}
 	resp.setCharacterEncoding("UTF-8");
 	resp.getWriter().write(respBody.toString());
 	

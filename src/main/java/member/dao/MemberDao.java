@@ -8,4 +8,5 @@ int insert(Member member);
 int updateById(Member member);
 Member selectByUsername(String table,String username);
 Member selectByUsernameAndPassword(Member member);
+Member selectByUserdata(Member member);
 }
