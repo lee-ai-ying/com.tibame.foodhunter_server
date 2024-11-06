@@ -14,4 +14,10 @@ public interface GroupService {
 
 	// 取得參加揪團清單
 	List<Group> getGroupList(Member member);
+
+	// 參加揪團
+	String joinGroup(Integer groupId, Integer memberId);
+
+	// 取得gorupId
+	int getGroupId(Group group);
 }

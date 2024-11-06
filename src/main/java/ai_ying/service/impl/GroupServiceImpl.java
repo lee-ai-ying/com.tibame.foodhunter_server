@@ -62,9 +62,26 @@ public class GroupServiceImpl implements GroupService {
 	@Override // 取得參加揪團清單
 	public List<Group> getGroupList(Member member) {
 		Integer memberId = member.getId();
-		if (memberId == null) {
+		if (groupDao.selectMemberById(memberId)==null) {
 			return null;
 		}
 		return groupDao.selectAllGroupsByMember(member);
+	}
+
+	@Override
+	public String joinGroup(Integer groupId, Integer memberId) {
+		if (groupDao.selectGroupById(groupId)==null) {
+			return "該揪團不存在";
+		}
+		if (groupDao.selectMemberById(memberId)==null) {
+			return "該會員不存在";
+		}
+		int result = groupDao.insertGroupMember(groupId,memberId);
+		return result > 0 ? null : "加入揪團失敗";
+	}
+
+	@Override
+	public int getGroupId(Group group) {
+		return groupDao.getIdAfterCreateGroup(group);
 	}
 }

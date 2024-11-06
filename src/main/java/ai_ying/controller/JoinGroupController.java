@@ -11,18 +11,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import ai_ying.service.GroupService;
 import ai_ying.service.impl.GroupServiceImpl;
-import ai_ying.vo.Group;
+import ai_ying.vo.GroupMember;
 
-@WebServlet("/group/search")
-public class SearchGroupController extends HttpServlet {
+@WebServlet("/group/join")
+public class JoinGroupController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private GroupService service;
-	
+
 	@Override
 	public void init() throws ServletException {
 		try {
@@ -31,14 +30,14 @@ public class SearchGroupController extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
-		Group group = gson.fromJson(req.getReader(), Group.class);
+		Gson gson = new Gson();
+		GroupMember object = gson.fromJson(req.getReader(), GroupMember.class);
 		JsonObject result = new JsonObject();
-		result.addProperty("result", gson.toJson(service.searchGroups(group)));
+		result.addProperty("result", gson.toJson(service.joinGroup(object.getGroupId(),object.getMemberId())));
 		PrintWriter out = resp.getWriter();
 		out.println(result.toString());
 	}
-
 }

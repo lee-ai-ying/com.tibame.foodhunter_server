@@ -30,16 +30,17 @@ public class CreateGroupController extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	
+	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
 		Group group = gson.fromJson(req.getReader(), Group.class);
-		
 		String errMsg = service.createGroup(group);
 		JsonObject respBody = new JsonObject();
 		respBody.addProperty("result", errMsg == null);
 		respBody.addProperty("errMsg", errMsg);
-		
+		if (errMsg == null) {
+			respBody.addProperty("groupId", service.getGroupId(group));
+		}
 		resp.getWriter().write(respBody.toString());
 	}
 

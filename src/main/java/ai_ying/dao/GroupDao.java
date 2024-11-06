@@ -14,4 +14,16 @@ public interface GroupDao {
 
 	// 取得參加揪團清單
 	List<Group> selectAllGroupsByMember(Member member);
+
+	// 參加揪團
+	int insertGroupMember(Integer groupId, Integer memberId);
+
+	// 取得揪團資料
+	Group selectGroupById(Integer groupId);
+
+	// 取得會員資料
+	Member selectMemberById(Integer memberId);
+	
+	// 建立揪團後取得揪團id
+	int getIdAfterCreateGroup(Group group);
 }
