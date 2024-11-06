@@ -6,14 +6,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import sharon.service.NoteService;
 import sharon.service.impl.NoteServiceImpl;
 import sharon.vo.Note;
 
-@WebServlet("/SelectNoteController")
-public class SelectNoteController extends HttpServlet {
+@WebServlet("/api/note/getNoteById")
+public class GetNoteByIdController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private NoteService service;
     
@@ -27,7 +26,7 @@ public class SelectNoteController extends HttpServlet {
     }
     
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
         // 設置編碼
         req.setCharacterEncoding("UTF-8");

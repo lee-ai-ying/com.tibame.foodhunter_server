@@ -1,5 +1,7 @@
 package sharon.service.impl;
 
+import java.util.List;
+
 import javax.naming.NamingException;
 
 import sharon.dao.NoteDao;
@@ -18,4 +20,10 @@ public class NoteServiceImpl implements NoteService {
     public Note getNoteById(int id) {
         return noteDao.selectById(id);
     }
+
+	@Override
+	public List<Note> getAllNotes() {
+		// TODO Auto-generated method stub
+		return noteDao.getAllNotes();
+	}
 }
