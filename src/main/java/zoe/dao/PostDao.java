@@ -23,4 +23,12 @@ public interface PostDao {
      * 根據ID獲取貼文
      */
     Post getPostById(Long postId);
+    
+    Integer insertPost(Post post);
+    /**
+     * 更新貼文
+     * @param post 包含要更新的貼文資訊，必須包含postId
+     * @return 更新成功返回1，失敗返回0
+     */
+    Integer updatePost(Post post);
 }

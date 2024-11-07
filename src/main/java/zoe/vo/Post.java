@@ -2,6 +2,8 @@ package zoe.vo;
 
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Post {
     private Integer postId;        // 留言編號
@@ -16,16 +18,17 @@ public class Post {
 
     private String publisherNickname;
     private String restaurantName; 
+    private List<PostPhoto> photos = new ArrayList<>();
+	private byte[] publisherProfileImage;
 
-
-    // 預設建構函數
     public Post() {
+        this.photos = new ArrayList<>();
     }
 
     // 完整建構函數
     public Post(Integer postId, String postTag, Integer publisher, String content,
-                Timestamp messageTime, Timestamp postTime, Integer visibility,
-                Integer restaurantId, Integer likeCount) {
+            Timestamp messageTime, Timestamp postTime, Integer visibility,
+            Integer restaurantId, Integer likeCount) {
         this.postId = postId;
         this.postTag = postTag;
         this.publisher = publisher;
@@ -35,9 +38,26 @@ public class Post {
         this.visibility = visibility;
         this.restaurantId = restaurantId;
         this.likeCount = likeCount;
+        this.photos = new ArrayList<>();
     }
 
-    // Getter 和 Setter 方法
+
+    public List<PostPhoto> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<PostPhoto> photos) {
+        this.photos = photos;
+    }
+
+
+    public byte[] getPublisherProfileImage() {
+        return publisherProfileImage;
+    }
+
+    public void setPublisherProfileImage(byte[] publisherProfileImage) {
+        this.publisherProfileImage = publisherProfileImage;
+    }
     public Integer getPostId() {
         return postId;
     }
@@ -122,5 +142,19 @@ public class Post {
     
     public String getRestaurantName() { return restaurantName; }
     public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }
+
+    public void addPhoto(PostPhoto photo) {
+        if (photo != null) {
+            if (this.photos == null) {
+                this.photos = new ArrayList<>();
+            }
+            System.out.println("添加照片到貼文 - Post ID: " + this.postId + 
+                             ", Photo ID: " + photo.getPostPhotoId());
+            this.photos.add(photo);
+            System.out.println("當前照片數量: " + this.photos.size());
+        }
+    }
+
+    
 
 }
