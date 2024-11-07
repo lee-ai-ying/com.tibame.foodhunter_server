@@ -5,20 +5,99 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.naming.NamingException;
 import zoe.dao.PostDao;
+import zoe.dao.PostPhotoDao;
 import zoe.dao.Impl.PostDaoImpl;
 import zoe.vo.Post;
+import zoe.vo.PostPhoto;
+import zoe.service.PostService;
+
+
+import java.sql.Timestamp;
+import java.sql.SQLException;
+import javax.naming.NamingException;
+
+import zoe.dao.PostDao;
+import zoe.dao.PostPhotoDao;
+import zoe.dao.Impl.PostDaoImpl;
+import zoe.dao.Impl.PostPhotoDaoImpl;
+import zoe.vo.Post;
+import zoe.vo.PostPhoto;
 import zoe.service.PostService;
 
 public class PostServiceImpl implements PostService {
     private PostDao postDao;
+    private PostPhotoDao postPhotoDao;
 
     public PostServiceImpl() throws NamingException {
-        postDao = new PostDaoImpl();
+        try {
+            postDao = new PostDaoImpl();
+            postPhotoDao = new PostPhotoDaoImpl();
+            System.out.println("PostService 初始化完成");
+        } catch (NamingException e) {
+            System.err.println("PostService 初始化失敗: " + e.getMessage());
+            throw e;
+        }
     }
 
+    @Override
+    public boolean createPost(Post post) {
+        boolean success = false;
+        PostPhotoDao photoDao = null;  // 在方法內創建實例
+        
+        try {
+            System.out.println("開始新增貼文流程 - " + 
+                             "Tag: " + post.getPostTag() + 
+                             ", Publisher: " + post.getPublisher() + 
+                             ", Content: " + post.getContent());
+            
+            // 初始化 PostPhotoDao
+            photoDao = new PostPhotoDaoImpl();
+            
+            // 設置時間和預設值
+            post.setPostTime(new Timestamp(System.currentTimeMillis()));
+            post.setVisibility(0);  // 預設可見性為 0
+            post.setLikeCount(0);   // 預設按讚數為 0
+            
+            // 1. 新增貼文主體
+            Integer postId = postDao.insertPost(post);
+            if (postId == null) {
+                throw new SQLException("新增貼文失敗");
+            }
+            
+            post.setPostId(postId);
+            System.out.println("成功新增貼文，ID: " + postId);
+            
+            // 2. 如果有照片，新增照片
+            if (post.getPhotos() != null && !post.getPhotos().isEmpty()) {
+                for (PostPhoto photo : post.getPhotos()) {
+                    photo.setPostId(postId);
+                    photo.setCreatedTime(new Timestamp(System.currentTimeMillis()));
+                    
+                    boolean photoInserted = photoDao.insertPostPhoto(photo);  // 使用本地實例
+                    if (!photoInserted) {
+                        throw new SQLException("新增照片失敗");
+                    }
+                }
+                System.out.println("成功新增 " + post.getPhotos().size() + " 張照片");
+            }
+            
+            success = true;
+            System.out.println("完成貼文新增流程");
+            
+        } catch (SQLException | NamingException e) {
+            System.err.println("新增貼文過程中發生錯誤: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return success;
+    }
+    
+    
     @Override
     public List<Post> preLoadPostService() {
         List<Post> posts = postDao.preLoadPost();
@@ -56,13 +135,6 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    // 為了符合 PostService 介面，需要實現其他方法，但目前先返回預設值
-    @Override
-    public boolean createPost(Post post) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-   
     @Override
     public Post getPostById(Long postId) {
         try {
@@ -88,9 +160,86 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public boolean updatePost(Post post) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean success = false;
+        
+        try {
+            System.out.println("開始更新貼文流程 - " + 
+                             "ID: " + post.getPostId() + 
+                             ", Tag: " + post.getPostTag() + 
+                             ", Content: " + post.getContent());
+            
+            // 檢查貼文是否存在
+            Post existingPost = postDao.getPostById(Long.valueOf(post.getPostId()));
+            if (existingPost == null) {
+                System.out.println("找不到要更新的貼文，ID: " + post.getPostId());
+                return false;
+            }
+            
+            // 複製不應該被更新的欄位
+            post.setPublisher(existingPost.getPublisher());  // 保持原始發布者
+            post.setPostTime(existingPost.getPostTime());    // 保持原始發布時間
+            if (post.getLikeCount() == null) {
+                post.setLikeCount(existingPost.getLikeCount()); // 保持原始按讚數
+            }
+            
+            // 1. 更新貼文主體
+            Integer result = postDao.updatePost(post);
+            if (result <= 0) {
+                throw new SQLException("更新貼文失敗");
+            }
+            
+            System.out.println("成功更新貼文基本資訊，ID: " + post.getPostId());
+            
+            // 2. 處理照片更新
+            if (post.getPhotos() != null && !post.getPhotos().isEmpty()) {
+                // 2.1 刪除現有照片
+                boolean photosDeleted = postPhotoDao.deletePhotosByPostId(Long.valueOf(post.getPostId()));
+                if (!photosDeleted) {
+                    System.out.println("刪除舊照片時發生問題，但將繼續處理新照片");
+                }
+                
+                // 2.2 新增新照片
+                boolean allPhotosInserted = true;
+                for (PostPhoto photo : post.getPhotos()) {
+                    photo.setPostId(post.getPostId());
+                    photo.setCreatedTime(new Timestamp(System.currentTimeMillis()));
+                    
+                    if (!postPhotoDao.insertPostPhoto(photo)) {
+                        allPhotosInserted = false;
+                        System.err.println("新增照片失敗 - Post ID: " + post.getPostId());
+                    }
+                }
+                
+                if (allPhotosInserted) {
+                    System.out.println("成功更新所有照片，共 " + post.getPhotos().size() + " 張");
+                } else {
+                    System.err.println("部分照片更新失敗");
+                }
+            } else {
+                // 如果沒有提供新照片，但要清空原有照片
+                boolean photosDeleted = postPhotoDao.deletePhotosByPostId(Long.valueOf(post.getPostId()));
+                if (photosDeleted) {
+                    System.out.println("已清空所有照片");
+                }
+            }
+            
+            // 3. 重新獲取更新後的貼文（包含照片）
+            Post updatedPost = postDao.getPostById(Long.valueOf(post.getPostId()));
+            if (updatedPost != null) {
+                System.out.println("貼文更新完成，當前照片數: " + 
+                    (updatedPost.getPhotos() != null ? updatedPost.getPhotos().size() : 0));
+            }
+            
+            success = true;
+            System.out.println("完成貼文更新流程");
+            
+        } catch (SQLException e) {
+            System.err.println("更新貼文過程中發生SQL錯誤: " + e.getMessage());
+            e.printStackTrace();
+        } 
+        
+        return success;
     }
-
     @Override
     public List<Post> getAllPosts() {
         throw new UnsupportedOperationException("Not implemented yet");
