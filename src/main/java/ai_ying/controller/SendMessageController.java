@@ -15,10 +15,10 @@ import com.google.gson.JsonObject;
 
 import ai_ying.service.GroupService;
 import ai_ying.service.impl.GroupServiceImpl;
-import ai_ying.vo.GroupMember;
+import ai_ying.vo.GroupChat;
 
-@WebServlet("/group/join")
-public class JoinGroupController extends HttpServlet {
+@WebServlet("/group/chat/send")
+public class SendMessageController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private GroupService service;
 
@@ -34,9 +34,9 @@ public class JoinGroupController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Gson gson = new Gson();
-		GroupMember groupMember = gson.fromJson(req.getReader(), GroupMember.class);
+		GroupChat groupChat = gson.fromJson(req.getReader(), GroupChat.class);
 		JsonObject result = new JsonObject();
-		result.addProperty("result", gson.toJson(service.joinGroup(groupMember)));
+		result.addProperty("result", gson.toJson(service.sendMessage(groupChat)));
 		PrintWriter out = resp.getWriter();
 		out.println(result.toString());
 	}

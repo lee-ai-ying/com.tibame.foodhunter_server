@@ -3,6 +3,8 @@ package ai_ying.service;
 import java.util.List;
 
 import ai_ying.vo.Group;
+import ai_ying.vo.GroupChat;
+import ai_ying.vo.GroupMember;
 import member.vo.Member;
 
 public interface GroupService {
@@ -16,8 +18,14 @@ public interface GroupService {
 	List<Group> getGroupList(Member member);
 
 	// 參加揪團
-	String joinGroup(Integer groupId, Integer memberId);
+	String joinGroup(GroupMember groupMember);
 
 	// 取得gorupId
 	int getGroupId(Group group);
+
+	// 傳送訊息
+	String sendMessage(GroupChat groupChat);
+
+	// 取得聊天紀錄
+	List<GroupChat> getGroupChatHistory(Group group);
 }

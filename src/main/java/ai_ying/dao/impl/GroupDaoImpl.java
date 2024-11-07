@@ -12,6 +12,8 @@ import javax.sql.DataSource;
 
 import ai_ying.dao.GroupDao;
 import ai_ying.vo.Group;
+import ai_ying.vo.GroupChat;
+import ai_ying.vo.GroupMember;
 import member.vo.Member;
 
 public class GroupDaoImpl implements GroupDao {
@@ -104,11 +106,11 @@ public class GroupDaoImpl implements GroupDao {
 	}
 
 	@Override // 參加揪團
-	public int insertGroupMember(Integer groupId, Integer memberId) {
+	public int insertGroupMember(GroupMember groupMember) {
 		String sql = "INSERT INTO `group_member`(`group_id`,`member_id`) values(?,?)";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
-			pstmt.setInt(1, groupId);
-			pstmt.setInt(2, memberId);
+			pstmt.setInt(1, groupMember.getGroupId());
+			pstmt.setInt(2, groupMember.getMemberId());
 			return pstmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -180,6 +182,45 @@ public class GroupDaoImpl implements GroupDao {
 			e.printStackTrace();
 		}
 		return -1;
+	}
+
+	@Override // 傳送訊息
+	public int insertGroupChat(GroupChat groupChat) {
+		String sql = "INSERT INTO `group_chat`(`group_id`,`member_id`,`message`) values(?,?,?)";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, groupChat.getGroupId());
+			pstmt.setInt(2, groupChat.getMemberId());
+			pstmt.setString(3, groupChat.getMessage());
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	@Override // 取得聊天紀錄
+	public List<GroupChat> selectAllGroupChatByGroupId(Group group) {
+		String sql = "SELECT * FROM `group_chat` AS GC LEFT JOIN `member` AS M ON GC.`member_id`=M.`member_id` WHERE `group_id` = ? ORDER BY `send_time` DESC;";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, group.getId());
+			try (ResultSet rs = pstmt.executeQuery();) {
+				List<GroupChat> result = new ArrayList<>();
+				while (rs.next()) {
+					GroupChat groupChat = new GroupChat();
+					groupChat.setMemberId(rs.getInt("member_id"));
+					groupChat.setMemberName(rs.getString("nickname"));
+					groupChat.setMessage(rs.getString("message"));
+					groupChat.setSendTime(rs.getTimestamp("send_time"));
+					result.add(groupChat);
+				}
+				return result;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

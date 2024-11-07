@@ -9,6 +9,8 @@ import ai_ying.dao.GroupDao;
 import ai_ying.dao.impl.GroupDaoImpl;
 import ai_ying.service.GroupService;
 import ai_ying.vo.Group;
+import ai_ying.vo.GroupChat;
+import ai_ying.vo.GroupMember;
 import member.vo.Member;
 
 public class GroupServiceImpl implements GroupService {
@@ -69,19 +71,36 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public String joinGroup(Integer groupId, Integer memberId) {
-		if (groupDao.selectGroupById(groupId)==null) {
+	public String joinGroup(GroupMember groupMember) {
+		if (groupDao.selectGroupById(groupMember.getGroupId())==null) {
 			return "該揪團不存在";
 		}
-		if (groupDao.selectMemberById(memberId)==null) {
+		if (groupDao.selectMemberById(groupMember.getMemberId())==null) {
 			return "該會員不存在";
 		}
-		int result = groupDao.insertGroupMember(groupId,memberId);
+		int result = groupDao.insertGroupMember(groupMember);
 		return result > 0 ? null : "加入揪團失敗";
 	}
 
 	@Override
 	public int getGroupId(Group group) {
 		return groupDao.getIdAfterCreateGroup(group);
+	}
+	
+	@Override
+	public String sendMessage(GroupChat groupChat) {
+		if (groupDao.selectGroupById(groupChat.getGroupId())==null) {
+			return "該揪團不存在";
+		}
+		if (groupDao.selectMemberById(groupChat.getMemberId())==null) {
+			return "該會員不存在";
+		}
+		int result = groupDao.insertGroupChat(groupChat);
+		return result > 0 ? null : "傳送訊息失敗";
+	}
+
+	@Override
+	public List<GroupChat> getGroupChatHistory(Group group) {
+		return groupDao.selectAllGroupChatByGroupId(group);
 	}
 }
