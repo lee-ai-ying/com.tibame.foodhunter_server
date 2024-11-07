@@ -50,12 +50,13 @@ public class SelectRestController extends HttpServlet {
 		} else {
 			for(Restaurant rest : restaurants) {
 				JsonObject respBody = new JsonObject();
-				respBody.addProperty("restaurant_id", rest.getRestaurantId());
-				respBody.addProperty("name", rest.getRestaurantName());
-				respBody.addProperty("address", rest.getAddress());
-				respBody.addProperty("latitude", rest.getLatitude());
-				respBody.addProperty("longitude", rest.getLongitude());
-				respBody.addProperty("label", rest.getRestaurantLabel());
+	            respBody.addProperty("restaurant_id", rest.getRestaurantId());
+	            respBody.addProperty("name", rest.getRestaurantName());
+	            respBody.addProperty("address", rest.getAddress());
+	            respBody.addProperty("opening_hours", rest.getOpeningHours());
+	            respBody.addProperty("home_phone", rest.getHomePhone());
+	            respBody.addProperty("latitude", rest.getLatitude());
+	            respBody.addProperty("longitude", rest.getLongitude());
 				restaurantArray.add(respBody);
 			}
 		}
