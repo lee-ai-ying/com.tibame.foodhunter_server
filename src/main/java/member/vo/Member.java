@@ -1,6 +1,13 @@
 package member.vo;
 
+
+
+import java.io.InputStream;
 import java.sql.Timestamp;
+
+
+
+
 
 public class Member {
 private Integer id;
@@ -16,7 +23,29 @@ private String phone;
 private String email;
 private String gender;
 private Timestamp birthday;
+private String profileImageBase64;
+private InputStream profileImageInputStream;
+private String friend;
 
+
+public String getFriend() {
+	return friend;
+}
+public void setFriend(String friend) {
+	this.friend = friend;
+}
+public InputStream getProfileImageInputStream() {
+	return profileImageInputStream;
+}
+public void setProfileImageInputStream(InputStream profileImageInputStream) {
+	this.profileImageInputStream = profileImageInputStream;
+}
+public String getProfileImageBase64() {
+	return profileImageBase64;
+}
+public void setProfileImageBase64(String profileImageBase64) {
+	this.profileImageBase64 = profileImageBase64;
+}
 public Integer getId() {
 	return id;
 }

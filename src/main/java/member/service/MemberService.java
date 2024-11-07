@@ -7,4 +7,7 @@ public interface MemberService {
 	Member login(Member member);
 	Member getinfo(Member member);
 	String save(Member member);
+	String image(Member member);
+	String saveimage(Member member);
+	String friendadd(Member member);
 }
