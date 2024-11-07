@@ -1,5 +1,9 @@
 package member.service.impl;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 import member.dao.MemberDao;
@@ -87,13 +91,13 @@ memberDao = new MemberDaoImpl();
 			return "暱稱名稱長度必須介於1-20";
 		}		
 			
-		
+		String username = member.getUsername();
 		String email = member.getEmail();
-		if(memberDao.selectByUsername("email",email) != null) {
+		if(memberDao.selectByUsersave("email",email,username) != null) {
 			return "此信箱名稱已被註冊";
 			}
 		String phone = member.getPhone();
-		if(memberDao.selectByUsername("phone",phone) != null) {
+		if(memberDao.selectByUsersave("phone",phone,username) != null) {
 			return "此號碼已被註冊";
 			}
 		if(phone.length() != 10) {
@@ -108,5 +112,44 @@ memberDao = new MemberDaoImpl();
 		
 		return result>0 ? null :"編輯錯誤";
 	}
+	@Override
+	public String image(Member member) {
+	    return memberDao.selectByimage(member);  // 直接返回 Base64 字符串
+	}
 	
+	@Override
+	public String saveimage(Member member) {
+	    // 检查是否提供了图片
+	    if (member.getProfileImageInputStream() != null) {
+	        try {
+	            // 调用 memberDao 中的 saveProfileImage 方法保存图片到数据库
+	            int rowsUpdated = memberDao.saveProfileImage(member);
+	            
+	            if (rowsUpdated > 0) {
+	                return null; // 成功保存图片
+	            } else {
+	                return "Error saving image to database"; // 如果更新失败
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return "Error saving image: " + e.getMessage(); // 捕获异常并返回错误信息
+	        }
+	    } else {
+	        return "No image provided"; // 如果没有图片则返回错误信息
+	    }
+	}
+	@Override
+	public String friendadd(Member member) {
+		String username = member.getUsername();
+		String friend = member.getFriend();
+		
+		if(memberDao.selectByUsername("username",friend) == null) {
+			return "好友帳號錯誤";
+		}
+		int result = memberDao.friendadd(member);
+		
+		return result > 0 ? null:"好友帳號錯誤";
+		
+		
+	}
 }
