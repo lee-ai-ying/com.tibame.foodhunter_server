@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -23,9 +25,15 @@ public class RestaurantDaoImpl implements RestaurantDao{
 	public List<Restaurant> selectByKeywordsAndPrice(List<String> labels, Integer price) {
 	
 		StringBuilder sql = new StringBuilder("select * from restaurant where");
+		Pattern cityDistrictPattern = Pattern.compile(".*市.*區");
 		List<String> conditions = new ArrayList<>();
 		for (String label: labels) {
-			conditions.add("(restaurant_name like ? OR restaurant_label like ?)");
+	        Matcher matcher = cityDistrictPattern.matcher(label);
+	        if (matcher.matches()) {
+	            conditions.add("(address LIKE ?)");
+	        } else {
+	        	conditions.add("(restaurant_name like ? OR restaurant_label like ?)");
+	        }
 		}
 		
 		if (price != null) {
@@ -40,8 +48,14 @@ public class RestaurantDaoImpl implements RestaurantDao{
 			int index = 1;
 			for (String label: labels) {
 				String keyword = "%" + label + "%";
-				pstmt.setString(index++, keyword); // name
-				pstmt.setString(index++, keyword); // label
+	            Matcher matcher = cityDistrictPattern.matcher(label);
+	            if (matcher.matches()) {
+	                pstmt.setString(index++, keyword); // address
+	            } else {
+					pstmt.setString(index++, keyword); // name
+					pstmt.setString(index++, keyword); // label
+	            }
+			
 			}
 			if (price != null) {
 				pstmt.setInt(index++, price);
@@ -78,7 +92,8 @@ public class RestaurantDaoImpl implements RestaurantDao{
 
 	@Override
 	public List<Restaurant> preLoadRestaurant() {
-		String sql = "select * from restaurant limit 10";
+		String sql = "select * from restaurant where restaurant_id >= (SELECT FLOOR( MAX(restaurant_id) * RAND()) FROM restaurant )"
+				+ "ORDER BY restaurant_id LIMIT 10";
 	
 		try (
 			Connection conn = ds.getConnection();
