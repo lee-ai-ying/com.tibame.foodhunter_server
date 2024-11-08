@@ -1,7 +1,9 @@
 package ai_ying.service;
 
 import java.util.List;
+import java.util.Set;
 
+import ai_ying.vo.FcmToken;
 import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
@@ -28,4 +30,10 @@ public interface GroupService {
 
 	// 取得聊天紀錄
 	List<GroupChat> getGroupChatHistory(Group group);
+	
+	// 註冊FCM token
+	String registerFcm(FcmToken fcmToken);
+	
+	// 取得特定group的token清單
+	Set<String> getTokens(Integer groupId);
 }

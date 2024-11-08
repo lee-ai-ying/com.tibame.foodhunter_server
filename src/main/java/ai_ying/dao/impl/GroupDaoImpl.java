@@ -4,13 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import ai_ying.dao.GroupDao;
+import ai_ying.vo.FcmToken;
 import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
@@ -25,9 +29,9 @@ public class GroupDaoImpl implements GroupDao {
 
 	@Override // 取得參加揪團清單
 	public List<Group> selectAllGroupsByMember(Member member) {
-		String sql = "SELECT * FROM `group_member` AS GM LEFT JOIN `group` AS G ON G.group_id = GM.group_id WHERE member_id = ?";
+		String sql = "SELECT * FROM `group_member` AS GM LEFT JOIN `group` AS G ON G.group_id = GM.group_id WHERE `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?)";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
-			pstmt.setInt(1, member.getId());
+			pstmt.setString(1, member.getUsername());
 			try (ResultSet rs = pstmt.executeQuery();) {
 				List<Group> groupList = new ArrayList<>();
 				while (rs.next()) {
@@ -107,10 +111,10 @@ public class GroupDaoImpl implements GroupDao {
 
 	@Override // 參加揪團
 	public int insertGroupMember(GroupMember groupMember) {
-		String sql = "INSERT INTO `group_member`(`group_id`,`member_id`) values(?,?)";
+		String sql = "INSERT INTO `group_member`(`group_id`,`member_id`) values(?, (SELECT `member_id` FROM `member` WHERE `username` = ?))";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setInt(1, groupMember.getGroupId());
-			pstmt.setInt(2, groupMember.getMemberId());
+			pstmt.setString(2, groupMember.getUsername());
 			return pstmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -129,7 +133,7 @@ public class GroupDaoImpl implements GroupDao {
 					group.setId(rs.getInt("group_id"));
 					group.setName(rs.getString("name"));
 					return group;
-				}				
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -141,16 +145,16 @@ public class GroupDaoImpl implements GroupDao {
 	}
 
 	@Override
-	public Member selectMemberById(Integer memberId) {
-		String sql = "SELECT * FROM `member` WHERE member_id = ?";
+	public Member selectMemberByUsername(String username) {
+		String sql = "SELECT * FROM `member` WHERE `username` = ?";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
-			pstmt.setInt(1, memberId);
+			pstmt.setString(1, username);
 			try (ResultSet rs = pstmt.executeQuery();) {
 				if (rs.next()) {
-					Member member= new Member();
-					member.setId(rs.getInt("member_id"));
+					Member member = new Member();
+					member.setUsername(rs.getString("username"));
 					return member;
-				}				
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -173,8 +177,8 @@ public class GroupDaoImpl implements GroupDao {
 			pstmt.setString(6, group.getDescribe());
 			try (ResultSet rs = pstmt.executeQuery();) {
 				if (rs.next()) {
-					return rs.getInt("group_id");			
-				}				
+					return rs.getInt("group_id");
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -186,10 +190,10 @@ public class GroupDaoImpl implements GroupDao {
 
 	@Override // 傳送訊息
 	public int insertGroupChat(GroupChat groupChat) {
-		String sql = "INSERT INTO `group_chat`(`group_id`,`member_id`,`message`) values(?,?,?)";
+		String sql = "INSERT INTO `group_chat`(`group_id`,`member_id`,`message`) values(?,(SELECT `member_id` FROM `member` WHERE `username` = ?),?)";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setInt(1, groupChat.getGroupId());
-			pstmt.setInt(2, groupChat.getMemberId());
+			pstmt.setString(2, groupChat.getUsername());
 			pstmt.setString(3, groupChat.getMessage());
 			return pstmt.executeUpdate();
 		} catch (Exception e) {
@@ -197,17 +201,17 @@ public class GroupDaoImpl implements GroupDao {
 		}
 		return -1;
 	}
-	
+
 	@Override // 取得聊天紀錄
 	public List<GroupChat> selectAllGroupChatByGroupId(Group group) {
-		String sql = "SELECT * FROM `group_chat` AS GC LEFT JOIN `member` AS M ON GC.`member_id`=M.`member_id` WHERE `group_id` = ? ORDER BY `send_time` DESC;";
+		String sql = "SELECT `username`, `nickname`, `message`, `send_time` FROM `group_chat` AS GC LEFT JOIN `member` AS M ON GC.`member_id`=M.`member_id` WHERE `group_id` = ? ORDER BY `send_time` DESC;";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setInt(1, group.getId());
 			try (ResultSet rs = pstmt.executeQuery();) {
 				List<GroupChat> result = new ArrayList<>();
 				while (rs.next()) {
 					GroupChat groupChat = new GroupChat();
-					groupChat.setMemberId(rs.getInt("member_id"));
+					groupChat.setUsername(rs.getString("username"));
 					groupChat.setMemberName(rs.getString("nickname"));
 					groupChat.setMessage(rs.getString("message"));
 					groupChat.setSendTime(rs.getTimestamp("send_time"));
@@ -223,4 +227,54 @@ public class GroupDaoImpl implements GroupDao {
 		return null;
 	}
 
+	@Override
+	public int insertFcmToken(FcmToken fcmToken) {
+		String sql = "INSERT INTO `fcm_token`(`member_id`,`token`) values((SELECT `member_id` FROM `member` WHERE `username` = ?), ?)";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setString(1, fcmToken.getUsername());
+			pstmt.setString(2, fcmToken.getFcmToken());
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	@Override
+	public Set<String> selectAllTokenByGroupId(Integer group_id) {
+		String sql = "SELECT `token` FROM `fcm_token` AS F LEFT JOIN `group_member` AS GM ON F.`member_id` = GM.`member_id` WHERE `group_id` = ?;";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, group_id);
+			try (ResultSet rs = pstmt.executeQuery();) {
+				Set<String> tokens = Collections.synchronizedSet(new HashSet<>());
+				while (rs.next()) {
+					tokens.add(rs.getString("token"));
+				}
+				return tokens;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public String selectTokenByUsername(String username) {
+		String sql = "SELECT `token` FROM `fcm_token` WHERE `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?)";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setString(1, username);
+			try (ResultSet rs = pstmt.executeQuery();) {
+				if (rs.next()) {
+					return rs.getString("token");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }
