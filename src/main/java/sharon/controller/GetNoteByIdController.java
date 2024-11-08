@@ -1,11 +1,14 @@
 package sharon.controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import sharon.service.NoteService;
 import sharon.service.impl.NoteServiceImpl;
@@ -31,8 +34,14 @@ public class GetNoteByIdController extends HttpServlet {
         // 設置編碼
         req.setCharacterEncoding("UTF-8");
         
-        // 從請求參數獲取note_id
-        String noteIdStr = req.getParameter("note_id");
+        // 解析 JSON 主體
+        JsonObject jsonRequest;
+        try (BufferedReader reader = req.getReader()) {
+            jsonRequest = new Gson().fromJson(reader, JsonObject.class);
+        }
+        
+     // 從 JSON 中獲取 note_id
+        String noteIdStr = jsonRequest.get("note_id").getAsString();
         
         if (noteIdStr != null && !noteIdStr.trim().isEmpty()) {
             try {
