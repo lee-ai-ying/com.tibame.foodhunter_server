@@ -6,7 +6,8 @@ import java.sql.Timestamp;
 public class Group {
 	private Integer id;
 	private String name;
-	private String location;
+	private Integer location;
+	private String locationName;
 	private Date time;
 	private Integer isPublic;
 	private String describe;
@@ -26,11 +27,17 @@ public class Group {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getLocation() {
+	public Integer getLocation() {
 		return location;
 	}
-	public void setLocation(String location) {
+	public void setLocation(Integer location) {
 		this.location = location;
+	}
+	public String getLocationName() {
+		return locationName;
+	}
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
 	}
 	public Date getTime() {
 		return time;

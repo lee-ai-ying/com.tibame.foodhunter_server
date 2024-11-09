@@ -8,7 +8,7 @@ public class Review {
 	private int reviewer;
 	private int restaurantId;
 	private int rating;
-	private String comment;
+	private String comments;
 	private Timestamp reviewDate;
 	private int thumbsUp;
 	private int thumbsDown;
@@ -22,12 +22,12 @@ public class Review {
 	public Review() {
 	};
 
-	public Review(int reviewId, int reviewer, int restaurantId, String comment, Timestamp reviewDate, int thumbsUp,
+	public Review(int reviewId, int reviewer, int restaurantId, String comments, Timestamp reviewDate, int thumbsUp,
 			int thumbsDown, Integer priceRangeMax, Integer priceRangeMin, String email, Integer serviceCharge) {
 		this.reviewId = reviewId;
 		this.reviewer = reviewer;
 		this.restaurantId = restaurantId;
-		this.comment = comment;
+		this.comments = comments;
 		this.reviewDate = reviewDate;
 		this.thumbsUp = thumbsUp;
 		this.thumbsDown = thumbsDown;
@@ -68,12 +68,12 @@ public class Review {
 		this.rating = rating;
 	}
 
-	public String getComment() {
-		return comment;
+	public String getComments() {
+		return comments;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 
 	public Timestamp getReviewDate() {

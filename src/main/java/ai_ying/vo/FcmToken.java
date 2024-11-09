@@ -1,20 +1,20 @@
 package ai_ying.vo;
 
-public class GroupMember {
-	private Integer groupId;
+public class FcmToken {
 	private Integer memberId;
 	private String username;
-	public Integer getGroupId() {
-		return groupId;
-	}
-	public void setGroupId(Integer groupId) {
-		this.groupId = groupId;
-	}
+	private String fcmToken;
 	public Integer getMemberId() {
 		return memberId;
 	}
 	public void setMemberId(Integer memberId) {
 		this.memberId = memberId;
+	}
+	public String getFcmToken() {
+		return fcmToken;
+	}
+	public void setFcmToken(String fcmToken) {
+		this.fcmToken = fcmToken;
 	}
 	public String getUsername() {
 		return username;
@@ -24,6 +24,6 @@ public class GroupMember {
 	}
 	@Override
 	public String toString() {
-		return "GroupMember [groupId=" + groupId + ", memberId=" + memberId + ", username=" + username + "]";
+		return "FcmToken [memberId=" + memberId + ", username=" + username + ", fcmToken=" + fcmToken + "]";
 	}
 }
