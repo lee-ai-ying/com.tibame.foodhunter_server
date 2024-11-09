@@ -26,6 +26,27 @@ private Timestamp birthday;
 private String profileImageBase64;
 private InputStream profileImageInputStream;
 private String friend;
+private String ProfileImage;
+private String roomid;
+
+
+public String getRoomid() {
+	return roomid;
+}
+
+public void setRoomid(String roomid) {
+	this.roomid = roomid;
+}
+
+
+public String getProfileImage() {
+	return ProfileImage;
+}
+
+public void setProfileImage(String profileImage) {
+	ProfileImage = profileImage;
+}
+
 
 
 public String getFriend() {

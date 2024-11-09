@@ -5,14 +5,10 @@ import java.sql.Timestamp;
 public class GroupChat {
 	private Integer groupId;
 	private Integer memberId;
+	private String username;
 	private String memberName;
 	private String message;
 	private Timestamp sendTime;
-	@Override
-	public String toString() {
-		return "GroupChat [groupId=" + groupId + ", memberId=" + memberId + ", memberName=" + memberName + ", message="
-				+ message + ", sendTime=" + sendTime + "]";
-	}
 	public String getMemberName() {
 		return memberName;
 	}
@@ -42,5 +38,16 @@ public class GroupChat {
 	}
 	public void setSendTime(Timestamp sendTime) {
 		this.sendTime = sendTime;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	@Override
+	public String toString() {
+		return "GroupChat [groupId=" + groupId + ", memberId=" + memberId + ", username=" + username + ", memberName="
+				+ memberName + ", message=" + message + ", sendTime=" + sendTime + "]";
 	}
 }

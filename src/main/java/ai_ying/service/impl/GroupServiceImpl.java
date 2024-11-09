@@ -2,15 +2,18 @@ package ai_ying.service.impl;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.naming.NamingException;
 
 import ai_ying.dao.GroupDao;
 import ai_ying.dao.impl.GroupDaoImpl;
 import ai_ying.service.GroupService;
+import ai_ying.vo.FcmToken;
 import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
+import andysearch.vo.Restaurant;
 import member.vo.Member;
 
 public class GroupServiceImpl implements GroupService {
@@ -26,8 +29,8 @@ public class GroupServiceImpl implements GroupService {
 		if (name == null || name.isBlank()) {
 			return "必須輸入揪團名稱";
 		}
-		String location = group.getLocation();
-		if (location == null || location.isBlank()) {
+		Integer location = group.getLocation();
+		if (location == null) {
 			return "必須選擇揪團地點";
 		}
 		String time = group.getTime().toString();
@@ -44,11 +47,11 @@ public class GroupServiceImpl implements GroupService {
 		if (name == null) {
 			group.setName("");
 		}
-		String location = group.getLocation();
-		if (location == null) {
-			group.setLocation("");
+		String locationName = group.getLocationName();
+		if (locationName == null) {
+			group.setLocationName("");
 		}
-		Date time= group.getTime();
+		Date time = group.getTime();
 		if (time == null) {
 			group.setTime(new Date(System.currentTimeMillis()));
 		}
@@ -56,15 +59,13 @@ public class GroupServiceImpl implements GroupService {
 		if (describe == null) {
 			group.setDescribe("");
 		}
-
-		//System.out.println("service: "+group.toString());
+		// System.out.println("service: "+group.toString());
 		return groupDao.getGroupsByCondition(group);
 	}
 
 	@Override // 取得參加揪團清單
 	public List<Group> getGroupList(Member member) {
-		Integer memberId = member.getId();
-		if (groupDao.selectMemberById(memberId)==null) {
+		if (groupDao.selectMemberByUsername(member.getUsername()) == null) {
 			return null;
 		}
 		return groupDao.selectAllGroupsByMember(member);
@@ -72,10 +73,10 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public String joinGroup(GroupMember groupMember) {
-		if (groupDao.selectGroupById(groupMember.getGroupId())==null) {
+		if (groupDao.selectGroupById(groupMember.getGroupId()) == null) {
 			return "該揪團不存在";
 		}
-		if (groupDao.selectMemberById(groupMember.getMemberId())==null) {
+		if (groupDao.selectMemberByUsername(groupMember.getUsername()) == null) {
 			return "該會員不存在";
 		}
 		int result = groupDao.insertGroupMember(groupMember);
@@ -86,13 +87,13 @@ public class GroupServiceImpl implements GroupService {
 	public int getGroupId(Group group) {
 		return groupDao.getIdAfterCreateGroup(group);
 	}
-	
+
 	@Override
 	public String sendMessage(GroupChat groupChat) {
-		if (groupDao.selectGroupById(groupChat.getGroupId())==null) {
+		if (groupDao.selectGroupById(groupChat.getGroupId()) == null) {
 			return "該揪團不存在";
 		}
-		if (groupDao.selectMemberById(groupChat.getMemberId())==null) {
+		if (groupDao.selectMemberByUsername(groupChat.getUsername()) == null) {
 			return "該會員不存在";
 		}
 		int result = groupDao.insertGroupChat(groupChat);
@@ -102,5 +103,48 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<GroupChat> getGroupChatHistory(Group group) {
 		return groupDao.selectAllGroupChatByGroupId(group);
+	}
+
+	@Override
+	public String registerFcm(FcmToken fcmToken) {
+		if (groupDao.selectMemberByUsername(fcmToken.getUsername()) == null) {
+			return "該會員不存在";
+		}
+		if (groupDao.selectTokenByUsername(fcmToken.getUsername()) != null) {
+			return "該token已註冊";
+		}
+		int result = groupDao.insertFcmToken(fcmToken);
+		return result > 0 ? null : "註冊fcm失敗";
+	}
+
+	@Override
+	public Set<String> getTokens(Integer groupId) {
+		return groupDao.selectAllTokenByGroupId(groupId);
+	}
+
+	@Override
+	public String leaveGroup(GroupMember groupMember) {
+		if (groupDao.selectGroupById(groupMember.getGroupId()) == null) {
+			return "該揪團不存在";
+		}
+		if (groupDao.selectMemberByUsername(groupMember.getUsername()) == null) {
+			return "該會員不存在";
+		}
+		int result = groupDao.deleteGroupMember(groupMember);
+		return result > 0 ? null : "離開揪團失敗";
+	}
+
+	@Override
+	// 取得頭像清單
+	public List<Member> getAvatars(Group group) {
+		if (groupDao.selectGroupById(group.getId()) == null) {
+			return null;
+		}
+		return groupDao.selectAvatarsByGroupId(group.getId());
+	}
+
+	@Override
+	public List<Restaurant> getRestaurantList() {
+		return groupDao.selectAllRestaurant();
 	}
 }
