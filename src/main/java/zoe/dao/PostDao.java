@@ -31,4 +31,9 @@ public interface PostDao {
      * @return 更新成功返回1，失敗返回0
      */
     Integer updatePost(Post post);
+    
+    /**
+     * 根據餐廳ID獲取貼文
+     */
+    List<Post> selectPostByRestId(Integer restId);
 }

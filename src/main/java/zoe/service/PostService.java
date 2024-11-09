@@ -1,6 +1,8 @@
 package zoe.service;
 
 import java.util.List;
+
+import andysearch.vo.Restaurant;
 import zoe.vo.Post;
 
 /**
@@ -58,5 +60,7 @@ public interface PostService {
 	     */
 	    List<Post> getPostsByUserId(Long userId);
 
+	    
+	    List<Post> getPostByRestId(Restaurant restaurant);
 	}
 
