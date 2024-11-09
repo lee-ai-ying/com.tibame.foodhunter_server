@@ -45,11 +45,6 @@ public class SendMessageController extends HttpServlet {
 //		result.addProperty("result", gson.toJson(service.sendMessage(groupChat)));
 //		PrintWriter out = resp.getWriter();
 //		out.println(result.toString());
-//		GroupChat groupChat = gson.fromJson(req.getReader(), GroupChat.class);
-//		JsonObject result = new JsonObject();
-//		result.addProperty("result", gson.toJson(service.sendMessage(groupChat)));
-//		PrintWriter out = resp.getWriter();
-//		out.println(result.toString());
 		Gson gson = new Gson();
 		JsonObject jsonObject = gson.fromJson(req.getReader(), JsonObject.class);
 		String title = jsonObject.get("title").getAsString();

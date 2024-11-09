@@ -1,9 +1,11 @@
 package ai_ying.dao.impl;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +20,7 @@ import ai_ying.vo.FcmToken;
 import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
+import andysearch.vo.Restaurant;
 import member.vo.Member;
 
 public class GroupDaoImpl implements GroupDao {
@@ -29,7 +32,7 @@ public class GroupDaoImpl implements GroupDao {
 
 	@Override // 取得參加揪團清單
 	public List<Group> selectAllGroupsByMember(Member member) {
-		String sql = "SELECT * FROM `group_member` AS GM LEFT JOIN `group` AS G ON G.group_id = GM.group_id WHERE `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?)";
+		String sql = "SELECT * FROM `group_member` AS GM LEFT JOIN `group` AS G ON G.group_id = GM.group_id LEFT JOIN `restaurant` AS R ON R.restaurant_id = G.location WHERE `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?)";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setString(1, member.getUsername());
 			try (ResultSet rs = pstmt.executeQuery();) {
@@ -38,7 +41,8 @@ public class GroupDaoImpl implements GroupDao {
 					Group group = new Group();
 					group.setId(rs.getInt("group_id"));
 					group.setName(rs.getString("name"));
-					group.setLocation(rs.getString("location"));
+					group.setLocation(rs.getInt("location"));
+					group.setLocationName(rs.getString("restaurant_name"));
 					group.setTime(rs.getDate("time"));
 					group.setPriceMin(rs.getInt("price_min"));
 					group.setPriceMax(rs.getInt("price_max"));
@@ -62,7 +66,7 @@ public class GroupDaoImpl implements GroupDao {
 				+ "values(?,?,?,?,?,?,?)";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setString(1, group.getName());
-			pstmt.setString(2, group.getLocation());
+			pstmt.setInt(2, group.getLocation());
 			pstmt.setDate(3, group.getTime());
 			pstmt.setInt(4, group.getPriceMin());
 			pstmt.setInt(5, group.getPriceMax());
@@ -77,10 +81,10 @@ public class GroupDaoImpl implements GroupDao {
 
 	@Override // 搜尋揪團
 	public List<Group> getGroupsByCondition(Group group) {
-		String sql = "SELECT * FROM `group` WHERE `name` LIKE ? AND `location` LIKE ? AND `time` = ? AND `price_min` >= ? AND `price_max` <= ? AND `is_public` = 0 AND `describe` LIKE ?";
+		String sql = "SELECT * FROM `group` WHERE `name` LIKE ? AND `location` IN (SELECT `restaurant_id` FROM `restaurant` WHERE `restaurant_name` LIKE ?) AND `time` = ? AND `price_min` >= ? AND `price_max` <= ? AND `is_public` = 0 AND `describe` LIKE ?";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setString(1, "%" + group.getName() + "%");
-			pstmt.setString(2, "%" + group.getLocation() + "%");
+			pstmt.setString(2, "%" + group.getLocationName() + "%");
 			pstmt.setDate(3, group.getTime());
 			pstmt.setInt(4, group.getPriceMin());
 			pstmt.setInt(5, group.getPriceMax());
@@ -91,7 +95,7 @@ public class GroupDaoImpl implements GroupDao {
 					group = new Group();
 					group.setId(rs.getInt("group_id"));
 					group.setName(rs.getString("name"));
-					group.setLocation(rs.getString("location"));
+					group.setLocation(rs.getInt("location"));
 					group.setTime(rs.getDate("time"));
 					group.setPriceMin(rs.getInt("price_min"));
 					group.setPriceMax(rs.getInt("price_max"));
@@ -170,7 +174,7 @@ public class GroupDaoImpl implements GroupDao {
 		String sql = "SELECT `group_id` FROM `group` WHERE `name` = ? AND `location` = ? AND `time` = ? AND `price_min` = ? AND `price_max` = ? AND `describe` = ? ORDER BY `create_time` DESC LIMIT 1";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setString(1, group.getName());
-			pstmt.setString(2, group.getLocation());
+			pstmt.setInt(2, group.getLocation());
 			pstmt.setDate(3, group.getTime());
 			pstmt.setInt(4, group.getPriceMin());
 			pstmt.setInt(5, group.getPriceMax());
@@ -269,6 +273,67 @@ public class GroupDaoImpl implements GroupDao {
 				if (rs.next()) {
 					return rs.getString("token");
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@Override // 離開揪團
+	public int deleteGroupMember(GroupMember groupMember) {
+		String sql = "DELETE FROM `group_member` WHERE `group_id` = ? AND `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?)";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, groupMember.getGroupId());
+			pstmt.setString(2, groupMember.getUsername());
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	@Override // 取得揪團內頭像
+	public List<Member> selectAvatarsByGroupId(Integer groupId){
+		String sql = "SELECT `username`, `profileimage` FROM `member` WHERE `member_id` IN (SELECT `member_id` FROM `group_member` WHERE `group_id` = ?);";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, groupId);
+			try (ResultSet rs = pstmt.executeQuery();) {
+				List<Member> result = new ArrayList<>();
+				while (rs.next()) {
+					Member member = new Member();
+					member.setUsername(rs.getString("username"));
+					byte[] imageData = null;
+	                InputStream inputStream = rs.getBinaryStream("profileimage");
+	                imageData = inputStream.readAllBytes(); 
+	                member.setProfileImageBase64(Base64.getEncoder().encodeToString(imageData));
+					result.add(member);
+				}
+				return result;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public List<Restaurant> selectAllRestaurant() {
+		String sql = "SELECT `restaurant_id`, `restaurant_name` FROM `restaurant`;";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			try (ResultSet rs = pstmt.executeQuery();) {
+				List<Restaurant> result = new ArrayList<>();
+				while (rs.next()) {
+					Restaurant restaurant = new Restaurant();
+					restaurant.setRestaurantId(rs.getInt("restaurant_id"));
+					restaurant.setRestaurantName(rs.getString("restaurant_name"));
+					result.add(restaurant);
+				}
+				return result;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

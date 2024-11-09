@@ -7,6 +7,7 @@ import ai_ying.vo.FcmToken;
 import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
+import andysearch.vo.Restaurant;
 import member.vo.Member;
 
 public interface GroupService {
@@ -36,4 +37,13 @@ public interface GroupService {
 	
 	// 取得特定group的token清單
 	Set<String> getTokens(Integer groupId);
+	
+	// 離開群組
+	String leaveGroup(GroupMember groupMember);
+	
+	// 取得頭像清單
+	List<Member> getAvatars(Group group);
+	
+	// 取得餐廳清單
+	List<Restaurant> getRestaurantList();
 }
