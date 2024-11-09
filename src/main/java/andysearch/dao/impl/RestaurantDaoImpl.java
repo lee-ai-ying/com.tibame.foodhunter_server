@@ -3,6 +3,7 @@ package andysearch.dao.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,6 +15,8 @@ import javax.sql.DataSource;
 
 import andysearch.dao.RestaurantDao;
 import andysearch.vo.Restaurant;
+import zoe.vo.Post;
+import zoe.vo.PostPhoto;
 
 public class RestaurantDaoImpl implements RestaurantDao{
 	private DataSource ds;
@@ -92,8 +95,9 @@ public class RestaurantDaoImpl implements RestaurantDao{
 
 	@Override
 	public List<Restaurant> preLoadRestaurant() {
-		String sql = "select * from restaurant where restaurant_id >= (SELECT FLOOR( MAX(restaurant_id) * RAND()) FROM restaurant )"
-				+ "ORDER BY restaurant_id LIMIT 10";
+//		String sql = "select * from restaurant where restaurant_id >= (SELECT FLOOR( MAX(restaurant_id) * RAND()) FROM restaurant )"
+//				+ "ORDER BY restaurant_id LIMIT 10";
+		String sql = "select * from restaurant limit 10";
 	
 		try (
 			Connection conn = ds.getConnection();
@@ -124,6 +128,12 @@ public class RestaurantDaoImpl implements RestaurantDao{
 		}
 		return new ArrayList<>();
 	}
+
+	
+
+
+	
+	
 	
 	
 }

@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.List;
 import javax.naming.NamingException;
+
+import andysearch.vo.Restaurant;
 import zoe.dao.PostDao;
 import zoe.dao.PostPhotoDao;
 import zoe.dao.Impl.PostDaoImpl;
@@ -250,4 +252,11 @@ public class PostServiceImpl implements PostService {
         throw new UnsupportedOperationException("Not implemented yet");
 
     }
+
+	@Override
+	public List<Post> getPostByRestId(Restaurant restaurant) {
+		Integer restId = restaurant.getRestaurantId();
+		
+		return postDao.selectPostByRestId(restId);
+	}
 }
