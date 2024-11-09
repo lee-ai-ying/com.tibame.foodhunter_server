@@ -112,8 +112,19 @@ public class NoteDaoImpl implements NoteDao {
 
 	@Override
 	public int deleteNoteById(int id) {
-		// TODO Auto-generated method stub
-		return 0;
+	    String sql = "DELETE FROM note WHERE note_id = ?";
+	    try (
+	        Connection conn = ds.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, id);
+	        int rowsAffected = pstmt.executeUpdate(); // 執行刪除並獲取影響的行數
+	        return rowsAffected; // 返回受影響的行數
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return 0; // 如果出現異常，返回 0 表示未刪除任何資料
 	}
+
 }
 	
