@@ -21,7 +21,7 @@ public class ReviewServiceImpl implements ReviewService {
 		List<Review> reviews = reviewDao.preLoadReviewsByRestaurantId(1);
 		System.out.println("Service層獲取的評論數: " + (reviews != null ? reviews.size() : "null"));
 		if (reviews != null && !reviews.isEmpty()) {
-			System.out.println("第一篇評論內容: " + reviews.get(0).getComment());
+			System.out.println("第一篇評論內容: " + reviews.get(0).getComments());
 		}
 		return reviews;
 	}
@@ -44,7 +44,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 			if (review != null) {
 				System.out.println("Service層成功獲取評論，ID: " + reviewId);
-				System.out.println("評論內容: " + review.getComment());
+				System.out.println("評論內容: " + review.getComments());
 				System.out.println("評論者: " + review.getReviewerNickname());
 				System.out.println("餐廳: " + review.getRestaurantName());
 

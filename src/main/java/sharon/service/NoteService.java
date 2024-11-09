@@ -1,12 +1,17 @@
 package sharon.service;
 
+import sharon.vo.Note;
 import java.util.List;
 
-import sharon.vo.Note;
-
 public interface NoteService {
+	 
     Note getNoteById(int id);
-    
-    List<Note> getAllNotes();
 
+    List<Note> getAllNotes();
+    
+    String createNote(Note note);
+
+    String updateNote(Note note);
+
+    int deleteNoteById(int id);
 }
