@@ -14,6 +14,7 @@ import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
 import andysearch.vo.Restaurant;
+import jessey.vo.Review;
 import member.vo.Member;
 
 public class GroupServiceImpl implements GroupService {
@@ -146,5 +147,35 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<Restaurant> getRestaurantList() {
 		return groupDao.selectAllRestaurant();
+	}
+
+	@Override // 取得餐廳評論
+	public Review getRestaurantReview(Review review) {
+		if (groupDao.selectRestaurantById(review.getRestaurantId()) == null) {
+			return null;
+		}
+		if (groupDao.selectMemberByUsername(review.getReviewerNickname()) == null) {
+			return null;
+		}
+		return groupDao.selectRestaurantReview(review);
+	}
+
+	@Override // 新增或更新評論
+	public String sendRestaurantReview(Review review) {
+		if (groupDao.selectRestaurantById(review.getRestaurantId()) == null) {
+			return "該餐廳不存在";
+		}
+		if (groupDao.selectMemberByUsername(review.getReviewerNickname()) == null) {
+			System.out.println(review.getReviewerNickname());
+			return "該會員不存在";
+		}
+		if (getRestaurantReview(review)==null) {
+			int result = groupDao.insertReview(review);
+			return result > 0 ? null : "新增評論失敗";
+		}
+		else {
+			int result = groupDao.updateReview(review);
+			return result > 0 ? null : "更新評論失敗";
+		}
 	}
 }

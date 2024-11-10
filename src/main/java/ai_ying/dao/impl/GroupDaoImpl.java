@@ -21,6 +21,7 @@ import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
 import andysearch.vo.Restaurant;
+import jessey.vo.Review;
 import member.vo.Member;
 
 public class GroupDaoImpl implements GroupDao {
@@ -281,7 +282,7 @@ public class GroupDaoImpl implements GroupDao {
 		}
 		return null;
 	}
-	
+
 	@Override // 離開揪團
 	public int deleteGroupMember(GroupMember groupMember) {
 		String sql = "DELETE FROM `group_member` WHERE `group_id` = ? AND `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?)";
@@ -294,9 +295,9 @@ public class GroupDaoImpl implements GroupDao {
 		}
 		return -1;
 	}
-	
+
 	@Override // 取得揪團內頭像
-	public List<Member> selectAvatarsByGroupId(Integer groupId){
+	public List<Member> selectAvatarsByGroupId(Integer groupId) {
 		String sql = "SELECT `username`, `profileimage` FROM `member` WHERE `member_id` IN (SELECT `member_id` FROM `group_member` WHERE `group_id` = ?);";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setInt(1, groupId);
@@ -306,9 +307,9 @@ public class GroupDaoImpl implements GroupDao {
 					Member member = new Member();
 					member.setUsername(rs.getString("username"));
 					byte[] imageData = null;
-	                InputStream inputStream = rs.getBinaryStream("profileimage");
-	                imageData = inputStream.readAllBytes(); 
-	                member.setProfileImageBase64(Base64.getEncoder().encodeToString(imageData));
+					InputStream inputStream = rs.getBinaryStream("profileimage");
+					imageData = inputStream.readAllBytes();
+					member.setProfileImageBase64(Base64.getEncoder().encodeToString(imageData));
 					result.add(member);
 				}
 				return result;
@@ -341,5 +342,79 @@ public class GroupDaoImpl implements GroupDao {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override // 使用id取得餐廳
+	public Restaurant selectRestaurantById(int restaurantId) {
+		String sql = "SELECT * FROM `restaurant` WHERE `restaurant_id` = ?;";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, restaurantId);
+			try (ResultSet rs = pstmt.executeQuery();) {
+				if (rs.next()) {
+					Restaurant restaurant = new Restaurant();
+					restaurant.setRestaurantId(rs.getInt("restaurant_id"));
+					return restaurant;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override // 取得餐廳評論
+	public Review selectRestaurantReview(Review review) {
+		String sql = "SELECT * FROM `review` WHERE `restaurant_id` = ? AND `reviewer` = (SELECT `member_id` FROM `member` WHERE `username` = ?);";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, review.getRestaurantId());
+			pstmt.setString(2, review.getReviewerNickname());
+			try (ResultSet rs = pstmt.executeQuery();) {
+				if (rs.next()) {
+					review = new Review();
+					review.setComments(rs.getString("comments"));
+					review.setRating(rs.getInt("rating"));
+					return review;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override // 新增餐廳評論
+	public int insertReview(Review review) {
+		String sql = "INSERT INTO `review` (`reviewer`,`restaurant_id`,`rating`,`comments`,`review_date`) values((SELECT `member_id` FROM `member` WHERE `username` = ?), ?, ?, ?, ?)";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			 pstmt.setString(1, review.getReviewerNickname());
+			 pstmt.setInt(2, review.getRestaurantId());
+			 pstmt.setInt(3, review.getRating());
+			 pstmt.setString(4, review.getComments());
+			 pstmt.setTimestamp(5, review.getReviewDate());
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	@Override // 更新餐廳評論
+	public int updateReview(Review review) {
+		String sql = "UPDATE `review` SET `rating` = ?, `comments` = ?, `review_date` = ? WHERE `reviewer`=(SELECT `member_id` FROM `member` WHERE `username` = ?) AND `restaurant_id`=?";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, review.getRating());
+			pstmt.setString(2, review.getComments());
+			pstmt.setTimestamp(3, review.getReviewDate());
+			pstmt.setString(4, review.getReviewerNickname());
+			pstmt.setInt(5, review.getRestaurantId());
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
 	}
 }

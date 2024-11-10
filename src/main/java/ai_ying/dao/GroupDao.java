@@ -8,6 +8,7 @@ import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
 import andysearch.vo.Restaurant;
+import jessey.vo.Review;
 import member.vo.Member;
 
 public interface GroupDao {
@@ -55,4 +56,16 @@ public interface GroupDao {
 	
 	// 取得餐廳清單
 	List<Restaurant> selectAllRestaurant();
+
+	// 使用id取得餐廳
+	Restaurant selectRestaurantById(int restaurantId);
+
+	// 取得餐廳評論
+	Review selectRestaurantReview(Review review);
+
+	// 新增餐廳評論
+	int insertReview(Review review);
+
+	// 更新餐廳評論
+	int updateReview(Review review);
 }
