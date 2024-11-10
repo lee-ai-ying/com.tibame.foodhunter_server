@@ -1,5 +1,7 @@
 package member.dao;
 
+import java.util.List;
+
 import member.vo.Member;
 
 
@@ -13,4 +15,9 @@ Member selectByUserdata(Member member);
 String selectByimage(Member member);
 int saveProfileImage(Member member);
 int friendadd(Member member);
+int frienddel(Member member);
+List<Member> selectByfriend(Member member);
+List<Member> selectByfriend2(Member member);
+List<Member> selectByRoomId(Member member);
+List<Member> selectByRoomId2(Member member);
 }

@@ -67,7 +67,7 @@ public class PostDaoImpl implements PostDao {
                         "FROM post p " +
                         "LEFT JOIN member m ON p.publisher = m.member_id " +
                         "LEFT JOIN restaurant r ON p.restaurantid = r.restaurant_id " +
-                        "ORDER BY p.post_time DESC LIMIT 20";
+                        "ORDER BY p.post_time DESC LIMIT 10";
 
             List<Post> results = new ArrayList<>();
 

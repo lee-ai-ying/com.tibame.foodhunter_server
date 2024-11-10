@@ -5,7 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -99,7 +101,7 @@ public class MemberDaoImpl implements MemberDao {
 		String sql = "select * from member where  username = ? and password = ?";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, member.getUsername());
-			pstmt.setString(2, member.getPassword());
+			pstmt.setString(2, member.getPassword());		
 			try (ResultSet rs = pstmt.executeQuery()) {
 				if (rs.next()) {
 					member.setId(rs.getInt("member_id"));
@@ -162,21 +164,33 @@ public class MemberDaoImpl implements MemberDao {
 		return null;
 	}
 	
+	
+	
 	@Override
 	public String selectByimage(Member member) {
-	    String sql = "select * from member where username = ?";
+	    String sql = "select profileimage from member where username = ?";
 	    try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-	        pstmt.setString(1, member.getUsername());
+	        pstmt.setString(1, member.getUsername());	     
 	        try (ResultSet rs = pstmt.executeQuery()) {
-	            if (rs.next()) {
+	            
+	        	if (rs.next()) {
 	                byte[] imageData = null;
 	                InputStream inputStream = rs.getBinaryStream("profileimage");
 	                imageData = inputStream.readAllBytes();  // 将输入流转换为 byte[]
-	                
+	                System.out.println(Base64.getEncoder().encodeToString(imageData));
 	                // 将图片的 byte[] 转换为 Base64 字符串
-	                return Base64.getEncoder().encodeToString(imageData);
-	            }
-	        }
+	                return Base64.getEncoder().encodeToString(imageData); 
+	                
+	        	} else {
+	                             System.out.println("圖片數據為 null，無法加載圖片");
+	                             return null;  // 如果圖片數據為 null，返回 null
+	                         }
+	                     }     
+	        	
+	        	
+	        	
+	        	
+	        
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
@@ -206,8 +220,7 @@ public class MemberDaoImpl implements MemberDao {
 
 	@Override
 	public int friendadd(Member member) {
-		String sql = "insert into friend(friend_id1,friend_id2,status) "
-				+ "values((select member_id from member where  username = ?),(select member_id from member where username = ?),1)";
+		String sql = "insert into friend(friend_id1,friend_id2,status) values((select member_id from member where  username = ?),(select member_id from member where username = ?),1)";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, member.getUsername());
 			pstmt.setString(2, member.getFriend());
@@ -217,4 +230,122 @@ public class MemberDaoImpl implements MemberDao {
 		}
 		return -1;
 	}
+
+	@Override
+	public int frienddel(Member member) {
+		String sql = "delete from friend where friend_id1 = (select member_id from member where  username = ?) and friend_id2 = (select member_id from member where username = ?)";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, member.getUsername());
+			pstmt.setString(2, member.getFriend());
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	@Override
+	public List<Member> selectByfriend(Member member) {
+		String sql = "select username,nickname from friend join member on member_id = friend_id2 where friend_id1 = (select member_id from member where username = ?)";
+		List<Member> members = new ArrayList<>();
+		 try (Connection conn = ds.getConnection(); 
+		         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		        
+		        pstmt.setString(1, member.getUsername());  // 設置 username 作為參數
+		        
+		        try (ResultSet rs = pstmt.executeQuery()) {
+		            while (rs.next()) {
+		                // 從結果集中提取資料
+		                Member friend = new Member();
+		                friend.setUsername(rs.getString("username"));
+		                friend.setNickname(rs.getString("nickname"));
+		                // 將 Member 添加到列表中
+		                members.add(friend);
+		            }
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    
+		    return members.isEmpty() ? null : members;  // 如果沒找到資料則返回 null，否則返回列表
+		}
+	@Override
+	public List<Member> selectByfriend2(Member member) {
+		String sql = "select username,nickname FROM friend join member on member_id = friend_id1 where friend_id2 =(select member_id from member where username = ?) and member_id not in(select member_id from friend join member on member_id = friend_id2 where friend_id1 = (select member_id from member where username = ?));";
+		List<Member> members = new ArrayList<>();
+		 try (Connection conn = ds.getConnection(); 
+		         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		        
+		        pstmt.setString(1, member.getUsername());  // 設置 username 作為參數
+		        pstmt.setString(2, member.getUsername());
+		        
+		        try (ResultSet rs = pstmt.executeQuery()) {
+		            while (rs.next()) {
+		                // 從結果集中提取資料
+		                Member friend = new Member();
+		                friend.setUsername(rs.getString("username"));
+		                friend.setNickname(rs.getString("nickname"));
+		                // 將 Member 添加到列表中
+		                members.add(friend);
+		            }
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    
+		    return members.isEmpty() ? null : members;  // 如果沒找到資料則返回 null，否則返回列表
+		}
+	@Override
+	public List<Member> selectByRoomId(Member member) {
+		String sql = "select concat(friend_id1,\"_\",friend_id2) roomid ,username,nickname from friend join member on member_id = friend_id2 where friend_id1 = (select member_id from member where username = ?)";
+		List<Member> members = new ArrayList<>();
+		 try (Connection conn = ds.getConnection(); 
+		         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		        
+		        pstmt.setString(1, member.getUsername());  // 設置 username 作為參數
+		        
+		        try (ResultSet rs = pstmt.executeQuery()) {
+		            while (rs.next()) {
+		                // 從結果集中提取資料
+		                Member friend = new Member();
+		                friend.setRoomid(rs.getString("roomid"));
+		                friend.setUsername(rs.getString("username"));
+		                friend.setNickname(rs.getString("nickname"));
+		                // 將 Member 添加到列表中
+		                members.add(friend);
+		            }
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    
+		    return members.isEmpty() ? null : members;  // 如果沒找到資料則返回 null，否則返回列表
+		}
+	public List<Member> selectByRoomId2(Member member) {
+		String sql = "select concat(friend_id2,\"_\",friend_id1) roomid ,username,nickname from (friend join member on member_id = friend_id1) join chat on member_id = message_id where  friend_id2 =(select member_id from member where username = ?) and member_id not in(select member_id from friend join member on member_id = friend_id2 where friend_id1 = (select member_id from member where username = ?))";
+		List<Member> members = new ArrayList<>();
+		 try (Connection conn = ds.getConnection(); 
+		         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		        
+		        pstmt.setString(1, member.getUsername());  // 設置 username 作為參數
+		        pstmt.setString(2, member.getUsername());
+		        try (ResultSet rs = pstmt.executeQuery()) {
+		            while (rs.next()) {
+		                // 從結果集中提取資料
+		                Member friend = new Member();
+		                friend.setRoomid(rs.getString("roomid"));
+		                friend.setUsername(rs.getString("username"));
+		                friend.setNickname(rs.getString("nickname"));
+		                // 將 Member 添加到列表中
+		                members.add(friend);
+		            }
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    
+		    return members.isEmpty() ? null : members;  // 如果沒找到資料則返回 null，否則返回列表
+		}
+	
+	
+	
 }

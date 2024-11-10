@@ -1,6 +1,7 @@
 package zoe.dao.Impl;
 
 
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,21 +34,21 @@ public class CommentDaoImpl implements CommentDao {
     
     @Override
     public List<Comment> selectByPostId(Integer postId) {
-        String sql = "SELECT m.*, mb.nickname as member_nickname " +
+        String sql = "SELECT m.*, mb.nickname as member_nickname, mb.profileimage " +
                     "FROM message m " +
                     "LEFT JOIN member mb ON m.member = mb.member_id " +
                     "WHERE m.post_id = ? " +
                     "ORDER BY m.message_time DESC";
 
         List<Comment> results = new ArrayList<>();
-        
+
         try (Connection conn = ds.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             System.out.println("執行SQL查詢: " + sql + " [postId=" + postId + "]");
-            
+
             pstmt.setInt(1, postId);
-            
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Comment comment = new Comment();
@@ -58,16 +59,34 @@ public class CommentDaoImpl implements CommentDao {
                     comment.setMessageTime(rs.getTimestamp("message_time"));
                     comment.setMemberNickname(rs.getString("member_nickname"));
                     
+                    // 處理 BLOB 轉 Base64
+                    Blob blob = rs.getBlob("profileimage");
+                    if (blob != null) {
+                        try {
+                            byte[] profileImage = blob.getBytes(1, (int) blob.length());
+                            comment.setProfileImage(profileImage);  // 這裡會自動轉換為 Base64
+                        } catch (SQLException e) {
+                            System.err.println("讀取會員照片失敗: " + e.getMessage());
+                        } finally {
+                            try {
+                                blob.free();
+                            } catch (SQLException e) {
+                                System.err.println("釋放 Blob 資源失敗: " + e.getMessage());
+                            }
+                        }
+                    }
+
                     results.add(comment);
                     System.out.println("讀取到留言: ID=" + comment.getMessageId() +
                                      ", Content=" + comment.getContent() +
-                                     ", Member=" + comment.getMemberNickname());
+                                     ", Member=" + comment.getMemberNickname() +
+                                     ", Has Profile Image=" + (comment.getProfileImage() != null));
                 }
             }
-            
+
             System.out.println("總共讀取到 " + results.size() + " 筆留言");
             return results;
-            
+
         } catch (SQLException e) {
             System.err.println("SQL執行錯誤: " + e.getMessage());
             e.printStackTrace();
