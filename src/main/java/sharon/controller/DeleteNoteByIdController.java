@@ -49,10 +49,8 @@ public class DeleteNoteByIdController extends HttpServlet {
                 int deleteResult = service.deleteNoteById(noteId);
 
                 if (deleteResult > 0) {
-                    // 刪除成功
                     respBody.addProperty("result", noteId + "刪除成功");
                 } else {
-                    // 查無此筆記
                     respBody.addProperty("error", "查無此筆記，無法刪除");
                 }
 

@@ -7,7 +7,7 @@ public interface NoteService {
 	 
     Note getNoteById(int id);
 
-    List<Note> getAllNotes();
+    List<Note> getAllNotes(int memberId);
     
     String createNote(Note note);
 

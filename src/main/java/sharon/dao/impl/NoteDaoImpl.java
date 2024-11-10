@@ -48,24 +48,26 @@ public class NoteDaoImpl implements NoteDao {
 	}
 	
 	@Override
-	public List<Note> selectAllNotes() {
-		String sql = "SELECT * FROM note";
+	public List<Note> selectAllNotes(int memberId) {
+		String sql = "SELECT * FROM note WHERE member_id = ?";
 		List<Note> notes = new ArrayList<>();
 
 		try (
 			Connection conn = ds.getConnection(); 
 			PreparedStatement pstmt = conn.prepareStatement(sql);
-		    ResultSet rs = pstmt.executeQuery()
 		 ) {
-			while (rs.next()) {
-				Note note = new Note();
-				note.setNoteId(rs.getInt("note_id"));
-				note.setTitle(rs.getString("title"));
-				note.setContent(rs.getString("content"));
-				note.setRestaurantId(rs.getInt("restaurant_id"));
-				note.setSelectedDate(rs.getDate("selected_date"));
-				note.setMemberId(rs.getInt("member_id"));
-				notes.add(note); // 添加到列表中
+			pstmt.setInt(1,memberId);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				while (rs.next()) {
+					Note note = new Note();
+					note.setNoteId(rs.getInt("note_id"));
+					note.setTitle(rs.getString("title"));
+					note.setContent(rs.getString("content"));
+					note.setRestaurantId(rs.getInt("restaurant_id"));
+					note.setSelectedDate(rs.getDate("selected_date"));
+					note.setMemberId(rs.getInt("member_id"));
+					notes.add(note); // 添加到列表中
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -106,9 +108,31 @@ public class NoteDaoImpl implements NoteDao {
 
 	@Override
 	public int updateNote(Note note) {
-		// TODO Auto-generated method stub
-		return 0;
+	    String sql = "UPDATE note SET " +
+	            "title = ?, " +
+	            "content = ?, " +
+	            "restaurant_id = ?, " +
+	            "selected_date = ? " +
+	            "WHERE note_id = ?";
+	    try (
+	        Connection conn = ds.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        int paramIndex = 1;
+	        pstmt.setString(paramIndex++, note.getTitle());
+	        pstmt.setString(paramIndex++, note.getContent());
+	        pstmt.setInt(paramIndex++, note.getRestaurantId());
+	        pstmt.setDate(paramIndex++, note.getSelectedDate());
+	        pstmt.setInt(paramIndex++, note.getNoteId());
+
+	        int rowsAffected = pstmt.executeUpdate();
+	        return rowsAffected;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return 0; // 若出現異常，返回 0 表示更新失敗
 	}
+
 
 	@Override
 	public int deleteNoteById(int id) {
