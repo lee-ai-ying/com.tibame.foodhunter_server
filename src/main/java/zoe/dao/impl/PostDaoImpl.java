@@ -379,7 +379,7 @@ public class PostDaoImpl implements PostDao {
             pstmt.setString(paramIndex++, post.getPostTag());
             pstmt.setInt(paramIndex++, post.getPublisher());
             pstmt.setString(paramIndex++, post.getContent());
-            pstmt.setInt(paramIndex++, post.getVisibility());
+            pstmt.setInt(paramIndex++, post.getVisibility() != null ? post.getVisibility() : 0);
             pstmt.setInt(paramIndex++, post.getRestaurantId());
             pstmt.setInt(paramIndex++, post.getLikeCount());
             pstmt.setInt(paramIndex++, post.getPostId());

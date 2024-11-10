@@ -62,7 +62,7 @@ public class PostServiceImpl implements PostService {
             
             // 設置時間和預設值
             post.setPostTime(new Timestamp(System.currentTimeMillis()));
-            post.setVisibility(0);  // 預設可見性為 0
+         
             post.setLikeCount(0);   // 預設按讚數為 0
             
             // 1. 新增貼文主體
