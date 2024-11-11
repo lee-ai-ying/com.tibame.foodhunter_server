@@ -1,7 +1,6 @@
 package member.controller;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,11 +14,11 @@ import com.google.gson.Gson;
 
 import member.service.MemberService;
 import member.service.impl.MemberServiceImpl;
-import member.vo.FriendInfo;
 import member.vo.Member;
+import member.vo.Message;
 
-@WebServlet("/member/friendFetch")
-public class FriendFetchController extends HttpServlet {
+@WebServlet("/member/messageFetch")
+public class MessageFetchController extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
     private MemberService service;
@@ -43,44 +42,41 @@ public class FriendFetchController extends HttpServlet {
 
         // 從請求中獲取用戶名
         Member member = gson.fromJson(req.getReader(), Member.class);
-        String username = member.getUsername().trim();
 
-        // 創建 Member 對象並設置用戶名
-        member.setUsername(username);
+        
 
-        // 從服務層獲取該用戶的好友列表
-        List<Member> friendsList = service.getFriends(member);
-        System.out.println(friendsList);
+        // 从服务层获取两个用户之间的消息记录
+        List<Member> messageList = service.getMessage(member);
+        System.out.println("Messages: " + messageList);
+
+
         // 如果沒有好友，返回空列表
-        if (friendsList == null || friendsList.isEmpty()) {
-            resp.getWriter().write(gson.toJson(new ArrayList<FriendInfo>()));
+        if (messageList == null || messageList.isEmpty()) {
+            resp.getWriter().write(gson.toJson(new ArrayList<Message>()));
             System.out.println("沒有好友");
             return;
         }
 
         // 用來存放好友信息的列表
-        List<FriendInfo> friendInfoList = new ArrayList<>();
+        List<Message> MessageList = new ArrayList<>();
 
         // 遍歷好友列表，獲取每個好友的資料
-        for (Member friend : friendsList) {
-        	// 假設 service.image 返回 Base64 編碼的圖片字符串
-            String base64Image = service.image(friend);  // 獲取好友的圖片
-            if (base64Image != null && !base64Image.isEmpty()) {
-                System.out.println("圖片已成功加載: " + base64Image);
-            } else {
-                System.out.println("圖片加載失敗或沒有圖片");
-            }
+        for (Member message : messageList) {
+        
+            
             // 創建 FriendInfo 並填充數據
-            FriendInfo friendInfo = new FriendInfo(friend.getId(),friend.getUsername(),friend.getNickname(),base64Image);
+        	Message Message = new Message(message.getMessage_id(),message.getReceiver_id(),message.getMessage(),message.getMessage_time());
             System.out.println("抓到好友");
             // 添加到列表中
-            friendInfoList.add(friendInfo);
+            MessageList.add(Message);
         }
 
         // 將好友信息轉換為 JSON 字符串
-        String jsonStr = gson.toJson(friendInfoList);
+        String jsonStr = gson.toJson(MessageList);
 
         // 將 JSON 字符串寫入響應
         resp.getWriter().write(jsonStr);
     }
 }
+
+

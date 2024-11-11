@@ -77,6 +77,12 @@ public class MemberServiceImpl implements MemberService {
 
 		return memberDao.selectByUserdata(member);
 	}
+	
+	@Override
+	public Member getemailinfo(Member member) {
+
+		return memberDao.selectByEmail(member);
+	}
 
 	@Override
 	public String save(Member member) {
@@ -109,6 +115,20 @@ public class MemberServiceImpl implements MemberService {
 		return result > 0 ? null : "編輯錯誤";
 	}
 
+	@Override
+	public String savenewpassword(Member member) {
+
+		String password = member.getPassword();
+		if (password == null || password.length() < 6 || password.length() > 12) {
+			return "密碼長度必須介於6-12";
+		}
+
+		
+
+		int result = memberDao.updateByPassword(member);
+
+		return result > 0 ? null : "編輯錯誤";
+	}
 	@Override
 	public String image(Member member) {
 		try {
@@ -193,6 +213,19 @@ public class MemberServiceImpl implements MemberService {
 	public List<Member> getRoomId2(Member member) {
 		return memberDao.selectByRoomId2(member);
 
+	}
+
+	@Override
+	public String sendMessage(Member member) {
+		int result = memberDao.insertmessage(member);
+		return result > 0 ? null : "訊息發送錯誤";
+		
+	}
+
+	@Override
+	public List<Member> getMessage(Member member) {
+		
+		return memberDao.selectByMessage(member);
 	}
 
 }

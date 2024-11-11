@@ -28,6 +28,42 @@ private InputStream profileImageInputStream;
 private String friend;
 private String ProfileImage;
 private String roomid;
+private String message_id;
+private Timestamp message_time;
+public Timestamp getMessage_time() {
+	return message_time;
+}
+
+public void setMessage_time(Timestamp message_time) {
+	this.message_time = message_time;
+}
+
+public String getMessage_id() {
+	return message_id;
+}
+
+public void setMessage_id(String message_id) {
+	this.message_id = message_id;
+}
+
+public String getReceiver_id() {
+	return receiver_id;
+}
+
+public void setReceiver_id(String receiver_id) {
+	this.receiver_id = receiver_id;
+}
+
+public String getMessage() {
+	return message;
+}
+
+public void setMessage(String message) {
+	this.message = message;
+}
+private String receiver_id;
+private String message;
+
 
 
 public String getRoomid() {
