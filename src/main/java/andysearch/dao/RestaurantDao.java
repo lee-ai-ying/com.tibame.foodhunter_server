@@ -14,4 +14,7 @@ public interface RestaurantDao {
 	
 	// 更新評論數
 	Integer  updateTotalScoresAndReview(Integer Restaurant, Integer total_review, Integer total_scores);
+	
+	// 以餐廳ID搜尋
+	Restaurant selectByRestId(Integer restaurant_id);
 }

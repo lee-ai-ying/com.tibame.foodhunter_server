@@ -143,7 +143,41 @@ public class RestaurantDaoImpl implements RestaurantDao{
 		}
 		return -1;
 	}
-
+	@Override
+	public Restaurant selectByRestId(Integer restaurant_id) {
+		// TODO Auto-generated method stub
+		
+		String sql = "select * from restaurant where restaurant_id = ?";
+		
+		try (
+			Connection conn = ds.getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(sql)
+		){
+			pstmt.setInt(1, restaurant_id);
+			Restaurant rest = new Restaurant();
+			try (ResultSet rs = pstmt.executeQuery()){
+				if (rs.next()) {
+					rest.setRestaurantId(rs.getInt("restaurant_id"));
+					rest.setRestaurantName(rs.getString("restaurant_name"));
+					rest.setAddress(rs.getString("address"));
+					rest.setTotalScores(rs.getInt("total_scores"));
+					rest.setTotalReview(rs.getInt("total_review"));
+					rest.setLatitude(rs.getDouble("latitude"));
+					rest.setLongitude(rs.getDouble("longitude"));
+					rest.setOpeningHours(rs.getString("opening_hours"));
+					rest.setHomePhone(rs.getString("home_phone"));
+					rest.setPriceRangeMax(rs.getInt("price_range_max"));
+					rest.setPriceRangeMin(rs.getInt("price_range_min"));
+					rest.setEmail(rs.getString("email"));
+				}
+				return rest;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	
 
 
