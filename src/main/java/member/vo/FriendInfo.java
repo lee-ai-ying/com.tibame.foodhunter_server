@@ -1,7 +1,18 @@
 package member.vo;
 
 public class FriendInfo {
-    private String username;
+	private Integer member_id;
+	
+
+	public Integer getMember_id() {
+		return member_id;
+	}
+
+	public void setMember_id(Integer member_id) {
+		this.member_id = member_id;
+	}
+
+	private String username;
     private String nickname;
     
 
@@ -17,8 +28,9 @@ public class FriendInfo {
    
 
 	// 构造函数
-    public FriendInfo(String username,String nickname, String profileImageBase64) {	
-        this.username = username;
+    public FriendInfo(Integer member_id,String username,String nickname, String profileImageBase64) {	
+    	this.member_id = member_id;
+    	this.username = username;
         this.nickname = nickname;
         this.profileImageBase64 = profileImageBase64;
     }
