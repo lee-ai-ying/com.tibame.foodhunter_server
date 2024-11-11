@@ -433,4 +433,68 @@ public class PostDaoImpl implements PostDao {
             return 0;
         }
     }
+
+	@Override
+	public List<Post> selectPostByRestId(Integer restId) {
+		String sql = "SELECT p.post_id, p.post_tag, p.publisher, p.content, p.post_time, " +
+                "p.visibility, p.restaurantid, p.like_count, m.nickname, r.restaurant_name, " +
+                "m.profileimage " +  // 添加 profileimage
+                "FROM post p " +
+                "LEFT JOIN member m ON p.publisher = m.member_id " +
+                "LEFT JOIN restaurant r ON p.restaurantid = r.restaurant_id " +
+                "WHERE p.restaurantid = ?";
+
+    try (Connection conn = ds.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        
+        pstmt.setInt(1, restId);
+        List<Post> results = new ArrayList<>();
+        try (ResultSet rs = pstmt.executeQuery()) {
+            while(rs.next()) {
+                Post post = new Post();
+                post.setPostId(rs.getInt("post_id"));
+                post.setPublisher(rs.getInt("publisher"));
+                post.setContent(rs.getString("content"));
+                post.setVisibility(rs.getInt("visibility"));
+                post.setRestaurantId(rs.getInt("restaurantid"));
+                post.setPublisherNickname(rs.getString("nickname"));
+                post.setRestaurantName(rs.getString("restaurant_name"));
+
+                // 添加頭像
+                byte[] profileImage = rs.getBytes("profileimage");
+                post.setPublisherProfileImage(profileImage);
+
+                // 加載照片
+                loadPhotosForPostOnlyOne(conn, post);
+                results.add(post);
+            }
+            return results;
+        }
+        
+    } catch (SQLException e) {
+        System.err.println("查詢貼文時發生錯誤，ID: " + restId + ", 錯誤訊息: " + e.getMessage());
+        e.printStackTrace();
+        return null;
+    	}
+	}
+	
+    private void loadPhotosForPostOnlyOne(Connection conn, Post post) throws SQLException {
+        try (PreparedStatement photoStmt = conn.prepareStatement(PHOTO_SQL)) {
+            photoStmt.setInt(1, post.getPostId());
+            ResultSet photoRs = photoStmt.executeQuery();
+            
+             if(photoRs.next()) {
+                PostPhoto photo = new PostPhoto();
+                photo.setPostPhotoId(photoRs.getInt("post_photo_id"));
+                photo.setPostId(photoRs.getInt("post_id"));
+                
+                // 直接讀取為 byte[]
+                byte[] photoBytes = photoRs.getBytes("photo_file");
+                photo.setPhotoFile(photoBytes);
+                
+                photo.setCreatedTime(photoRs.getTimestamp("created_time"));
+                post.addPhoto(photo);
+            }
+        }
+    }
 }

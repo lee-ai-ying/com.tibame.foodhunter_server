@@ -128,6 +128,21 @@ public class RestaurantDaoImpl implements RestaurantDao{
 		}
 		return new ArrayList<>();
 	}
+	
+	@Override
+	public Integer updateTotalScoresAndReview(Integer restaurant_id, Integer total_review, Integer total_scores) {
+		String sql = "update restaurant set total_review = ?, total_scores = ? where restaurant_id = ?";;
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, total_review);
+			pstmt.setInt(2, total_scores);
+			pstmt.setInt(3, restaurant_id);
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
 
 	
 

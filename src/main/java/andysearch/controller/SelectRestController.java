@@ -53,10 +53,13 @@ public class SelectRestController extends HttpServlet {
 	            respBody.addProperty("restaurant_id", rest.getRestaurantId());
 	            respBody.addProperty("name", rest.getRestaurantName());
 	            respBody.addProperty("address", rest.getAddress());
+	            respBody.addProperty("total_scores", rest.getTotalScores());
+	            respBody.addProperty("total_review", rest.getTotalReview());
 	            respBody.addProperty("opening_hours", rest.getOpeningHours());
 	            respBody.addProperty("home_phone", rest.getHomePhone());
 	            respBody.addProperty("latitude", rest.getLatitude());
 	            respBody.addProperty("longitude", rest.getLongitude());
+	            respBody.addProperty("email", rest.getEmail());
 				restaurantArray.add(respBody);
 			}
 		}

@@ -7,4 +7,5 @@ public interface RestaurantService {
 
 	List<Restaurant> selectRest(String searchtext);
 	List<Restaurant> preLoadRestService();
+	Integer updateRestReviewAndScores(Restaurant restaurant);
 }

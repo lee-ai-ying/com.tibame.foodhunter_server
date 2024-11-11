@@ -54,4 +54,14 @@ public class RestaurantServiceImpl implements RestaurantService{
 	        return false;
 	    }
 	}
+
+
+
+	@Override
+	public Integer updateRestReviewAndScores(Restaurant restaurant) {
+		Integer restaurant_id = restaurant.getRestaurantId();
+		Integer total_review = restaurant.getTotalReview();
+		Integer total_scores = restaurant.getTotalScores();
+		return restaurantDao.updateTotalScoresAndReview(restaurant_id, total_review, total_scores);
+	}
 }
