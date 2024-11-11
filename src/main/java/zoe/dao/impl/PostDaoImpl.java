@@ -67,7 +67,7 @@ public class PostDaoImpl implements PostDao {
                         "FROM post p " +
                         "LEFT JOIN member m ON p.publisher = m.member_id " +
                         "LEFT JOIN restaurant r ON p.restaurantid = r.restaurant_id " +
-                        "ORDER BY p.post_time DESC LIMIT 10";
+                        "ORDER BY p.post_time DESC LIMIT 20";
 
             List<Post> results = new ArrayList<>();
 
@@ -363,77 +363,48 @@ public class PostDaoImpl implements PostDao {
     @Override
     public Integer updatePost(Post post) {
         String sql = "UPDATE post SET " +
-                     "post_tag = ?, " +
-                     "publisher = ?, " +
-                     "content = ?, " +
-                     "visibility = ?, " +
-                     "restaurantid = ?, " +
-                     "like_count = ? " +
-                     "WHERE post_id = ?";
-        
+                    "post_tag = ?, " +
+                    "content = ? " +
+                    "WHERE post_id = ?";
+
         try (Connection conn = ds.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            // 開始設置更新參數
-            int paramIndex = 1;
-            pstmt.setString(paramIndex++, post.getPostTag());
-            pstmt.setInt(paramIndex++, post.getPublisher());
-            pstmt.setString(paramIndex++, post.getContent());
-            pstmt.setInt(paramIndex++, post.getVisibility() != null ? post.getVisibility() : 0);
-            pstmt.setInt(paramIndex++, post.getRestaurantId());
-            pstmt.setInt(paramIndex++, post.getLikeCount());
-            pstmt.setInt(paramIndex++, post.getPostId());
-            
-            System.out.println("準備更新貼文 - " + 
-                             "\nID: " + post.getPostId() +
-                             "\nTag: " + post.getPostTag() + 
-                             "\nPublisher: " + post.getPublisher() + 
-                             "\nContent: " + post.getContent() +
-                             "\nVisibility: " + post.getVisibility() +
-                             "\nRestaurantId: " + post.getRestaurantId() +
-                             "\nLike Count: " + post.getLikeCount());
-            
+
+            // 設置更新參數 - 只更新標籤和內容
+            pstmt.setString(1, post.getPostTag());
+            pstmt.setString(2, post.getContent());
+            pstmt.setInt(3, post.getPostId());
+
+            System.out.println("準備更新貼文 - " +
+                    "\nID: " + post.getPostId() +
+                    "\nTag: " + post.getPostTag() +
+                    "\nContent: " + post.getContent() +
+                    "\n原有資料保持不變: " +
+                    "\nPublisher: " + post.getPublisher() +
+                    "\nVisibility: " + post.getVisibility() +
+                    "\nRestaurantId: " + post.getRestaurantId() +
+                    "\nLike Count: " + post.getLikeCount() +
+                    "\n照片數量: " + (post.getPhotos() != null ? post.getPhotos().size() : 0));
+
             // 執行更新
             int rowsAffected = pstmt.executeUpdate();
-            
-            // 如果有照片需要更新，處理照片更新
-            if (post.getPhotos() != null && !post.getPhotos().isEmpty()) {
-                // 先刪除原有的照片
-                String deletePhotosSql = "DELETE FROM post_photo WHERE post_id = ?";
-                try (PreparedStatement deleteStmt = conn.prepareStatement(deletePhotosSql)) {
-                    deleteStmt.setInt(1, post.getPostId());
-                    deleteStmt.executeUpdate();
-                    System.out.println("已刪除舊有照片記錄");
-                }
-                
-                // 插入新的照片
-                String insertPhotoSql = "INSERT INTO post_photo (post_id, photo_file, created_time) VALUES (?, ?, ?)";
-                try (PreparedStatement insertStmt = conn.prepareStatement(insertPhotoSql)) {
-                    for (PostPhoto photo : post.getPhotos()) {
-                        insertStmt.setInt(1, post.getPostId());
-                        insertStmt.setBytes(2, photo.getPhotoFile());
-                        insertStmt.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                        insertStmt.executeUpdate();
-                    }
-                    System.out.println("已新增 " + post.getPhotos().size() + " 張新照片");
-                }
-            }
+
+            // 移除照片更新相關代碼，保持原有照片不變
             
             if (rowsAffected > 0) {
-                System.out.println("成功更新貼文，ID: " + post.getPostId());
+                System.out.println("成功更新貼文內容和標籤，ID: " + post.getPostId());
                 return rowsAffected;
             } else {
                 System.out.println("更新貼文失敗，找不到指定的貼文，ID: " + post.getPostId());
                 return 0;
             }
-            
+
         } catch (SQLException e) {
             System.err.println("更新貼文時發生錯誤，ID: " + post.getPostId() + ", 錯誤訊息: " + e.getMessage());
             e.printStackTrace();
             return 0;
         }
     }
-
 	@Override
 	public List<Post> selectPostByRestId(Integer restId) {
 		String sql = "SELECT p.post_id, p.post_tag, p.publisher, p.content, p.post_time, " +
@@ -476,5 +447,33 @@ public class PostDaoImpl implements PostDao {
         e.printStackTrace();
         return null;
     	}
+	}
+
+	@Override
+	public String getUsernameByMemberId(Integer memberId) {
+	    String sql = "SELECT username FROM member WHERE member_id = ?";
+	
+	    try (Connection conn = ds.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, memberId);
+	      
+	        
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                String username = rs.getString("username");
+	                System.out.println("查詢成功，找到 username: " + username);
+	                return username;
+	            } else {
+	                System.out.println("查詢結果為空，沒有找到對應的 username");
+	                return null;
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("=== SQL執行錯誤 ===");
+	  
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
 }

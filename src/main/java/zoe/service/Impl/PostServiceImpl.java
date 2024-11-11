@@ -163,83 +163,56 @@ public class PostServiceImpl implements PostService {
     @Override
     public boolean updatePost(Post post) {
         boolean success = false;
-        
+
         try {
-            System.out.println("開始更新貼文流程 - " + 
-                             "ID: " + post.getPostId() + 
-                             ", Tag: " + post.getPostTag() + 
-                             ", Content: " + post.getContent());
-            
+            System.out.println("開始更新貼文流程 - " +
+                    "ID: " + post.getPostId() +
+                    ", Tag: " + post.getPostTag() +
+                    ", Content: " + post.getContent());
+
             // 檢查貼文是否存在
             Post existingPost = postDao.getPostById(Long.valueOf(post.getPostId()));
             if (existingPost == null) {
                 System.out.println("找不到要更新的貼文，ID: " + post.getPostId());
                 return false;
             }
-            
+
             // 複製不應該被更新的欄位
-            post.setPublisher(existingPost.getPublisher());  // 保持原始發布者
-            post.setPostTime(existingPost.getPostTime());    // 保持原始發布時間
+            post.setPublisher(existingPost.getPublisher()); // 保持原始發布者
+            post.setPostTime(existingPost.getPostTime()); // 保持原始發布時間
             if (post.getLikeCount() == null) {
                 post.setLikeCount(existingPost.getLikeCount()); // 保持原始按讚數
             }
+            // 保持原始照片
+            post.setPhotos(existingPost.getPhotos());
             
             // 1. 更新貼文主體
             Integer result = postDao.updatePost(post);
             if (result <= 0) {
                 throw new SQLException("更新貼文失敗");
             }
-            
+
             System.out.println("成功更新貼文基本資訊，ID: " + post.getPostId());
-            
-            // 2. 處理照片更新
-            if (post.getPhotos() != null && !post.getPhotos().isEmpty()) {
-                // 2.1 刪除現有照片
-                boolean photosDeleted = postPhotoDao.deletePhotosByPostId(Long.valueOf(post.getPostId()));
-                if (!photosDeleted) {
-                    System.out.println("刪除舊照片時發生問題，但將繼續處理新照片");
-                }
-                
-                // 2.2 新增新照片
-                boolean allPhotosInserted = true;
-                for (PostPhoto photo : post.getPhotos()) {
-                    photo.setPostId(post.getPostId());
-                    photo.setCreatedTime(new Timestamp(System.currentTimeMillis()));
-                    
-                    if (!postPhotoDao.insertPostPhoto(photo)) {
-                        allPhotosInserted = false;
-                        System.err.println("新增照片失敗 - Post ID: " + post.getPostId());
-                    }
-                }
-                
-                if (allPhotosInserted) {
-                    System.out.println("成功更新所有照片，共 " + post.getPhotos().size() + " 張");
-                } else {
-                    System.err.println("部分照片更新失敗");
-                }
-            } else {
-                // 如果沒有提供新照片，但要清空原有照片
-                boolean photosDeleted = postPhotoDao.deletePhotosByPostId(Long.valueOf(post.getPostId()));
-                if (photosDeleted) {
-                    System.out.println("已清空所有照片");
-                }
-            }
-            
+
+            // 2. 照片保持不變，不進行更新
+            System.out.println("保持原有照片不變，照片數: " + 
+                (post.getPhotos() != null ? post.getPhotos().size() : 0));
+
             // 3. 重新獲取更新後的貼文（包含照片）
             Post updatedPost = postDao.getPostById(Long.valueOf(post.getPostId()));
             if (updatedPost != null) {
-                System.out.println("貼文更新完成，當前照片數: " + 
-                    (updatedPost.getPhotos() != null ? updatedPost.getPhotos().size() : 0));
+                System.out.println("貼文更新完成，當前照片數: " +
+                        (updatedPost.getPhotos() != null ? updatedPost.getPhotos().size() : 0));
             }
-            
+
             success = true;
             System.out.println("完成貼文更新流程");
-            
+
         } catch (SQLException e) {
             System.err.println("更新貼文過程中發生SQL錯誤: " + e.getMessage());
             e.printStackTrace();
-        } 
-        
+        }
+
         return success;
     }
     @Override
@@ -259,4 +232,23 @@ public class PostServiceImpl implements PostService {
 		
 		return postDao.selectPostByRestId(restId);
 	}
+
+	@Override
+	public String getUsernameByMemberId(Integer memberId) {
+	    if (memberId == null || memberId <= 0) {
+	        System.out.println("無效的 memberId: " + memberId);
+	        return null;
+	    }
+	    
+	    try {
+	        String username = postDao.getUsernameByMemberId(memberId);
+	        System.out.println("查詢結果 - memberId: " + memberId + ", username: " + username);
+	        return username;
+	    } catch (Exception e) {
+	        System.err.println("查詢 username 時發生錯誤: " + e.getMessage());
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
+
 }
