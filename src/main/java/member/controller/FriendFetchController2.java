@@ -70,7 +70,7 @@ public class FriendFetchController2 extends HttpServlet {
                 System.out.println("圖片加載失敗或沒有圖片");
             }
             // 創建 FriendInfo 並填充數據
-            FriendInfo friendInfo = new FriendInfo(friend.getUsername(),friend.getNickname(),base64Image);
+            FriendInfo friendInfo = new FriendInfo(friend.getId(),friend.getUsername(),friend.getNickname(),base64Image);
             System.out.println("抓到好友");
             // 添加到列表中
             friendInfoList.add(friendInfo);
