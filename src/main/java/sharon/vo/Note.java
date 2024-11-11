@@ -66,15 +66,15 @@ public class Note {
 	
 	@Override
 	public String toString() {
-	    return "Note{" +
-	           "noteId=" + noteId +
-	           ", title='" + title + '\'' +
-	           ", content='" + content + '\'' +
-	           ", restaurantId=" + restaurantId +
-	           ", selectedDate=" + selectedDate +
-	           ", memberId=" + memberId +
-	           '}';
+	    return "Note {\n" +
+	           "  noteId=" + noteId + ",\n" +
+	           "  title='" + title + "',\n" +
+	           "  content='" + content + "',\n" +
+	           "  restaurantId=" + restaurantId + ",\n" +
+	           "  selectedDate=" + selectedDate + ",\n" +
+	           "  memberId=" + memberId + ",\n" +
+	           "  restaurantName='" + restaurantName + "'\n" +
+	           "}";
 	}
-
 }
 

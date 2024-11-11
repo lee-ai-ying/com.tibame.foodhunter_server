@@ -31,10 +31,9 @@ public class GetNoteByIdController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
-        // 設置編碼
-        req.setCharacterEncoding("UTF-8");
+
+    	req.setCharacterEncoding("UTF-8");
         
-        // 解析 JSON 主體
         JsonObject jsonRequest;
         try (BufferedReader reader = req.getReader()) {
             jsonRequest = new Gson().fromJson(reader, JsonObject.class);

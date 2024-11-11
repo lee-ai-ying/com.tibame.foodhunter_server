@@ -33,20 +33,13 @@ public class CreateNoteController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
-    	// 設置編碼
+    	
         req.setCharacterEncoding("UTF-8");
     	
 		Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
     	Note note = gson.fromJson(req.getReader(), Note.class);
-    	
-    	System.out.println("Title: " + note.getTitle());
-    	System.out.println("Content: " + note.getContent());
-    	System.out.println("Restaurant ID: " + note.getRestaurantId());
-    	System.out.println("Selected Date: " + note.getSelectedDate());
-    	System.out.println("Member ID: " + note.getMemberId());
 
         System.out.println("Parsed Note Object: " + note);
-        System.out.println("Selected Date: " + note.getSelectedDate()); //檢查 selectedDate
     	
     	String errMsg = service.createNote(note);
     	JsonObject respBody = new JsonObject();
@@ -54,11 +47,16 @@ public class CreateNoteController extends HttpServlet {
     	respBody.addProperty("result", errMsg == null);  // 沒有errMsg 代表返回成功
     	respBody.addProperty("errMsg", errMsg);
     	
-    	// 創建成功返回 noteId
-    	if (errMsg == null) {
-            respBody.addProperty("noteId", note.getNoteId());  
+        if (errMsg == null) {
+            respBody.addProperty("result", true);
+            respBody.addProperty("noteId", note.getNoteId());
+        } else {
+            respBody.addProperty("result", false);
+            respBody.addProperty("errMsg", errMsg);
         }
     	
+    	resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
     	resp.getWriter().write(respBody.toString());
 
     }

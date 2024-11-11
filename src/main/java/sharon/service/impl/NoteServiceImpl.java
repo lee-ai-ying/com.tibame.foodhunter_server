@@ -25,8 +25,8 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<Note> getAllNotes() {
-        return noteDao.selectAllNotes();
+    public List<Note> getAllNotes(int memberId) {
+        return noteDao.selectAllNotes(memberId);
     }
 
     @Override
