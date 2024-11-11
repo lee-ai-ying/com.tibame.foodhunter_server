@@ -19,15 +19,9 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public List<Review> preLoadReviewByRestIdService() {
-		List<Review> reviews = reviewDao.preLoadReviewsByRestaurantId(1);
-		System.out.println("Service層獲取的評論數: " + (reviews != null ? reviews.size() : "null"));
-		if (reviews != null && !reviews.isEmpty()) {
-			System.out.println("第一篇評論內容: " + reviews.get(0).getComments());
-		}
-		return reviews;
-	}
-
+    public List<Review> preLoadReviewsByRestaurantId(Integer restaurantId) {
+        return reviewDao.preLoadReviewsByRestaurantId(restaurantId);
+    }
 	@Override
 	public boolean createReview(Review review) {
 		boolean success = false;

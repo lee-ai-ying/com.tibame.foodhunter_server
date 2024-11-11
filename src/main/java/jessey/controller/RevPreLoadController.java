@@ -12,66 +12,83 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import andysearch.vo.Restaurant;
 import jessey.service.ReviewService;
 import jessey.service.impl.ReviewServiceImpl;
 import jessey.vo.Review;
 
 @WebServlet("/review/preLoadController")
 public class RevPreLoadController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	private ReviewService reviewService;
-	private Gson gson;
+    private static final long serialVersionUID = 1L;
+    private ReviewService reviewService;
+    private Gson gson;
 
-	@Override
-	public void init() throws ServletException {
-		try {
-			reviewService = new ReviewServiceImpl();
-			gson = new Gson();
+    @Override
+    public void init() throws ServletException {
+        try {
+            reviewService = new ReviewServiceImpl();
+            gson = new Gson();
+        } catch (NamingException e) {
+            throw new ServletException("初始化 ReviewService 失敗", e);
+        }
+    }
 
-		} catch (NamingException e) {
-			throw new ServletException("初始化 ReviewService 失敗", e);
-		}
-	}
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Gson gson = new Gson();
+        try {
+            // 從請求體讀取 JSON
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = req.getReader().readLine()) != null) {
+                sb.append(line);
+            }
+            
+            // 解析請求中的 restaurantId
+            RequestBody requestBody = gson.fromJson(sb.toString(), RequestBody.class);
+            Integer restaurantId = requestBody.getRestaurantId();
 
-		resp.setContentType("application/json");
-		req.setCharacterEncoding("UTF-8");
+            // 取得特定餐廳的評論列表
+            List<Review> reviews = reviewService.preLoadReviewsByRestaurantId(restaurantId);
+            
+            // 轉換為 JSON 並回傳
+            String jsonResponse = gson.toJson(reviews);
+            resp.getWriter().write(jsonResponse);
+            
+        } catch (Exception e) {
+            getServletContext().log("取得評論列表時發生錯誤", e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write(gson.toJson(new ErrorResponse("取得評論列表失敗")));
+        }
+    }
 
-		try {
-			// 取得評論列表
-			List<Review> reviews = reviewService.preLoadReviewByRestIdService();
-			// 轉換為 JSON 並回傳
-			String jsonResponse = gson.toJson(reviews != null ? reviews : List.of());
-			resp.getWriter().write(jsonResponse);
-		} catch (Exception e) {
-			// 記錄錯誤
-			getServletContext().log("取得評論列表時發生錯誤", e);
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        resp.getWriter().write(gson.toJson(new ErrorResponse("請使用 POST 方法")));
+    }
 
-			// 設置錯誤狀態和回傳錯誤訊息
-			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			resp.getWriter().write(gson.toJson(new ErrorResponse("取得評論列表失敗")));
-		}
-	}
+    // 請求體類
+    private static class RequestBody {
+        private Integer restaurantId;
+        
+        public Integer getRestaurantId() {
+            return restaurantId;
+        }
+    }
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		doGet(req, resp);
-	}
-
-	// 內部類別用於錯誤回應
-	private static class ErrorResponse {
-		private final String error;
-
-		public ErrorResponse(String error) {
-			this.error = error;
-		}
-
-		public String getError() {
-			return error;
-		}
-	}
+    // 錯誤回應類
+    private static class ErrorResponse {
+        private final String error;
+        
+        public ErrorResponse(String error) {
+            this.error = error;
+        }
+        
+        public String getError() {
+            return error;
+        }
+    }
 }
