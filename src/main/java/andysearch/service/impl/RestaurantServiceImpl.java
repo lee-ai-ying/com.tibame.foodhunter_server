@@ -54,4 +54,25 @@ public class RestaurantServiceImpl implements RestaurantService{
 	        return false;
 	    }
 	}
+
+
+
+	@Override
+	public Integer updateRestReviewAndScores(Restaurant restaurant) {
+		Integer restaurant_id = restaurant.getRestaurantId();
+		Integer total_review = restaurant.getTotalReview();
+		Integer total_scores = restaurant.getTotalScores();
+		return restaurantDao.updateRestReviewAndScores(restaurant_id, total_review, total_scores);
+	}
+
+
+
+	@Override
+	public Restaurant selectRestById(Restaurant restaurant) {
+		Integer restaurant_id = restaurant.getRestaurantId();
+		if (restaurant_id == null || restaurant_id == 0) {
+			return new Restaurant();
+		}
+		return restaurantDao.selectByRestId(restaurant_id);
+	}
 }
