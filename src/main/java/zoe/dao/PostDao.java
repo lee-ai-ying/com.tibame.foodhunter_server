@@ -36,4 +36,6 @@ public interface PostDao {
      * 根據餐廳ID獲取貼文
      */
     List<Post> selectPostByRestId(Integer restId);
+
+	String getUsernameByMemberId(Integer memberId);
 }

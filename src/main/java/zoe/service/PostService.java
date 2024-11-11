@@ -59,7 +59,7 @@ public interface PostService {
 	     * @return 該用戶的所有貼文列表
 	     */
 	    List<Post> getPostsByUserId(Long userId);
-
+	    String getUsernameByMemberId(Integer memberId);
 	    
 	    List<Post> getPostByRestId(Restaurant restaurant);
 	}
