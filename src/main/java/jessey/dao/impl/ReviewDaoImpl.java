@@ -30,7 +30,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
 	// 載入特定 restaurant_id 最近的 10 條評論
 	@Override
-	public List<Review> preLoadReviewsByRestaurantId(int restaurantId) {
+	public List<Review> preLoadReviewsByRestaurantId(Integer restaurantId) {
 		String sql = "SELECT r.review_id, r.reviewer, r.restaurant_id, r.rating, r.comments, r.review_date, "
 				+ "r.thumbs_up, r.thumbs_down, r.price_range_max, r.price_range_min, r.service_charge, "
 				+ "m.nickname AS reviewer_nickname, res.restaurant_name " + "FROM review r "
@@ -50,6 +50,7 @@ public class ReviewDaoImpl implements ReviewDao {
 					review.setReviewId(rs.getInt("review_id"));
 					review.setReviewer(rs.getInt("reviewer"));
 					review.setRestaurantId(rs.getInt("restaurant_id"));
+					review.setRating(rs.getInt("rating"));
 					review.setComments(rs.getString("comments"));
 					review.setReviewDate(rs.getTimestamp("review_date"));
 					review.setThumbsUp(rs.getInt("thumbs_up"));
@@ -107,7 +108,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
 	// 修改評論，只有評論者可以修改
 	@Override
-	public boolean updateReview(Review review) {
+	public Integer updateReview(Review review) {
 		String sql = "UPDATE review SET rating = ?, comments = ?, thumbs_up = ?, thumbs_down = ?, "
 				+ "price_range_max = ?, price_range_min = ?, service_charge = ? "
 				+ "WHERE review_id = ? AND reviewer = ?";
@@ -126,17 +127,23 @@ public class ReviewDaoImpl implements ReviewDao {
 
 			int rowsAffected = pstmt.executeUpdate();
 
-			return rowsAffected > 0;
+			 if (rowsAffected > 0) {
+	                System.out.println("成功修改，評論ID: " + review.getReviewId());
+	                return rowsAffected;
+	            } else {
+	                System.out.println("修改失敗:找不到指定的評論，ID: " + review.getReviewId());
+	                return 0;
+	            }
 
 		} catch (SQLException e) {
 			System.err.println("修改評論時發生錯誤: " + e.getMessage());
-			return false;
 		}
+		return 0;
 	}
 
 	// 按讚或倒讚評論
 	@Override
-	public boolean likeOrDislikeReview(int reviewId, boolean like) {
+	public boolean likeOrDislikeReview(Integer reviewId, boolean like) {
 		String sql = like ? "UPDATE review SET thumbs_up = thumbs_up + 1 WHERE review_id = ?"
 				: "UPDATE review SET thumbs_down = thumbs_down + 1 WHERE review_id = ?";
 
@@ -155,7 +162,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
 	// 複製評論文字
 	@Override
-	public String copyReviewComment(int reviewId) {
+	public String copyReviewComment(Integer reviewId) {
 		String sql = "SELECT comments FROM review WHERE review_id = ?";
 
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -178,7 +185,7 @@ public class ReviewDaoImpl implements ReviewDao {
 
 	// 根據指定排序方式顯示評論
 	@Override
-	public List<Review> getReviewsSorted(int restaurantId, String sortBy) {
+	public List<Review> getReviewsSorted(Integer restaurantId, String sortBy) {
 		String sql = "SELECT r.review_id, r.reviewer, r.restaurant_id, r.rating, r.comments, r.review_date, "
 				+ "r.thumbs_up, r.thumbs_down, r.price_range_max, r.price_range_min, r.service_charge, "
 				+ "m.nickname AS reviewer_nickname, res.restaurant_name " + "FROM review r "
@@ -201,7 +208,8 @@ public class ReviewDaoImpl implements ReviewDao {
 					review.setReviewId(rs.getInt("review_id"));
 					review.setReviewer(rs.getInt("reviewer"));
 					review.setRestaurantId(rs.getInt("restaurant_id"));
-					review.setComments(rs.getString("comment"));
+					review.setRating(rs.getInt("rating"));
+					review.setComments(rs.getString("comments"));
 					review.setReviewDate(rs.getTimestamp("review_date"));
 					review.setThumbsUp(rs.getInt("thumbs_up"));
 					review.setThumbsDown(rs.getInt("thumbs_down"));
@@ -224,7 +232,7 @@ public class ReviewDaoImpl implements ReviewDao {
 	}
 
 	@Override
-	public Review getReviewById(int reviewId) {
+	public Review getReviewById(Integer reviewId) {
 		String sql = "SELECT r.review_id, r.reviewer, r.restaurant_id, r.rating, r.comments, r.review_date, "
 				+ "r.thumbs_up, r.thumbs_down, r.price_range_max, r.price_range_min, r.service_charge, "
 				+ "m.nickname AS reviewer_nickname, res.restaurant_name " + "FROM review r "
@@ -241,7 +249,8 @@ public class ReviewDaoImpl implements ReviewDao {
 					review.setReviewId(rs.getInt("review_id"));
 					review.setReviewer(rs.getInt("reviewer"));
 					review.setRestaurantId(rs.getInt("restaurant_id"));
-					review.setComments(rs.getString("comment"));
+					review.setRating(rs.getInt("rating"));
+					review.setComments(rs.getString("comments"));
 					review.setReviewDate(rs.getTimestamp("review_date"));
 					review.setThumbsUp(rs.getInt("thumbs_up"));
 					review.setThumbsDown(rs.getInt("thumbs_down"));
@@ -254,13 +263,13 @@ public class ReviewDaoImpl implements ReviewDao {
 					System.out.println("成功查詢到評論，ID: " + reviewId);
 					return review;
 				} else {
-					System.out.println("找不到貼文，ID: " + reviewId);
+					System.out.println("找不到評論，ID: " + reviewId);
 					return null;
 				}
 			}
 
 		} catch (SQLException e) {
-			System.err.println("查詢貼文時發生錯誤，ID: " + reviewId + ", 錯誤訊息: " + e.getMessage());
+			System.err.println("查詢評論時發生錯誤，ID: " + reviewId + ", 錯誤訊息: " + e.getMessage());
 			e.printStackTrace();
 			return null;
 		}

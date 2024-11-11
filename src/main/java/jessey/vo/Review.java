@@ -4,17 +4,17 @@ import java.sql.Timestamp;
 
 public class Review {
 
-	private int reviewId;
-	private int reviewer;
-	private int restaurantId;
-	private int rating;
+	private Integer reviewId;
+	private Integer reviewer;
+	private Integer restaurantId;
+	private Integer rating;
 	private String comments;
 	private Timestamp reviewDate;
-	private int thumbsUp;
-	private int thumbsDown;
-	private int priceRangeMax;
-	private int priceRangeMin;
-	private int serviceCharge;
+	private Integer thumbsUp;
+	private Integer thumbsDown;
+	private Integer priceRangeMax;
+	private Integer priceRangeMin;
+	private Integer serviceCharge;
 
 	private String reviewerNickname;
 	private String restaurantName;
@@ -22,11 +22,12 @@ public class Review {
 	public Review() {
 	};
 
-	public Review(int reviewId, int reviewer, int restaurantId, String comments, Timestamp reviewDate, int thumbsUp,
-			int thumbsDown, Integer priceRangeMax, Integer priceRangeMin, String email, Integer serviceCharge) {
+	public Review(Integer reviewId, Integer reviewer, Integer restaurantId, Integer rating , String comments, Timestamp reviewDate, Integer thumbsUp,
+			Integer thumbsDown, Integer priceRangeMax, Integer priceRangeMin, String email, Integer serviceCharge) {
 		this.reviewId = reviewId;
 		this.reviewer = reviewer;
 		this.restaurantId = restaurantId;
+		this.rating = rating;
 		this.comments = comments;
 		this.reviewDate = reviewDate;
 		this.thumbsUp = thumbsUp;
@@ -36,35 +37,35 @@ public class Review {
 		this.serviceCharge = serviceCharge;
 	}
 
-	public int getReviewId() {
+	public Integer getReviewId() {
 		return reviewId;
 	}
 
-	public void setReviewId(int reviewId) {
+	public void setReviewId(Integer reviewId) {
 		this.reviewId = reviewId;
 	}
 
-	public int getReviewer() {
+	public Integer getReviewer() {
 		return reviewer;
 	}
 
-	public void setReviewer(int reviewer) {
+	public void setReviewer(Integer reviewer) {
 		this.reviewer = reviewer;
 	}
 
-	public int getRestaurantId() {
+	public Integer getRestaurantId() {
 		return restaurantId;
 	}
 
-	public void setRestaurantId(int restaurantId) {
+	public void setRestaurantId(Integer restaurantId) {
 		this.restaurantId = restaurantId;
 	}
 
-	public int getRating() {
+	public Integer getRating() {
 		return rating;
 	}
 
-	public void setRating(int rating) {
+	public void setRating(Integer rating) {
 		this.rating = rating;
 	}
 
@@ -84,43 +85,43 @@ public class Review {
 		this.reviewDate = reviewDate;
 	}
 
-	public int getThumbsUp() {
+	public Integer getThumbsUp() {
 		return thumbsUp;
 	}
 
-	public void setThumbsUp(int thumbsUp) {
+	public void setThumbsUp(Integer thumbsUp) {
 		this.thumbsUp = thumbsUp;
 	}
 
-	public int getThumbsDown() {
+	public Integer getThumbsDown() {
 		return thumbsDown;
 	}
 
-	public void setThumbsDown(int thumbsDown) {
+	public void setThumbsDown(Integer thumbsDown) {
 		this.thumbsDown = thumbsDown;
 	}
 
-	public int getPriceRangeMax() {
+	public Integer getPriceRangeMax() {
 		return priceRangeMax;
 	}
 
-	public void setPriceRangeMax(int priceRangeMax) {
+	public void setPriceRangeMax(Integer priceRangeMax) {
 		this.priceRangeMax = priceRangeMax;
 	}
 
-	public int getPriceRangeMin() {
+	public Integer getPriceRangeMin() {
 		return priceRangeMin;
 	}
 
-	public void setPriceRangeMin(int priceRangeMin) {
+	public void setPriceRangeMin(Integer priceRangeMin) {
 		this.priceRangeMin = priceRangeMin;
 	}
 
-	public int getServiceCharge() {
+	public Integer getServiceCharge() {
 		return serviceCharge;
 	}
 
-	public void setServiceCharge(int serviceCharge) {
+	public void setServiceCharge(Integer serviceCharge) {
 		this.serviceCharge = serviceCharge;
 	}
 
