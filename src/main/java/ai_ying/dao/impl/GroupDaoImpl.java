@@ -417,4 +417,40 @@ public class GroupDaoImpl implements GroupDao {
 		}
 		return -1;
 	}
+
+	@Override // 計算total_review
+	public int getTotalReviewSum(int restaurantId) {
+		String sql = "SELECT COUNT(*) AS `total_reviews` FROM `review` WHERE `restaurant_id` = ?;";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1,restaurantId);
+			try (ResultSet rs = pstmt.executeQuery();) {
+				if (rs.next()) {
+					return rs.getInt("total_reviews");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	@Override // 計算total_scores
+	public int getTotalScoresSum(int restaurantId) {
+		String sql = "SELECT SUM(`rating`) AS `total_scores` FROM `review` WHERE `restaurant_id` = ?;";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1,restaurantId);
+			try (ResultSet rs = pstmt.executeQuery();) {
+				if (rs.next()) {
+					return rs.getInt("total_scores");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
 }

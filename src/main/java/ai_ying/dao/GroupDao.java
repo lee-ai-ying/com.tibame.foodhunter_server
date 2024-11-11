@@ -68,4 +68,10 @@ public interface GroupDao {
 
 	// 更新餐廳評論
 	int updateReview(Review review);
+	
+	// 計算total_review
+	int getTotalReviewSum(int restaurantId);
+
+	// 計算total_scores
+	int getTotalScoresSum(int restaurantId);
 }
