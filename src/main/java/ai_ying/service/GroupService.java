@@ -3,11 +3,14 @@ package ai_ying.service;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gson.JsonElement;
+
 import ai_ying.vo.FcmToken;
 import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
 import andysearch.vo.Restaurant;
+import jessey.vo.Review;
 import member.vo.Member;
 
 public interface GroupService {
@@ -46,4 +49,10 @@ public interface GroupService {
 	
 	// 取得餐廳清單
 	List<Restaurant> getRestaurantList();
+
+	// 取得餐廳評論
+	Review getRestaurantReview(Review review);
+
+	// 新增或更新評論
+	String sendRestaurantReview(Review review);
 }

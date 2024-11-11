@@ -13,14 +13,19 @@ import ai_ying.vo.FcmToken;
 import ai_ying.vo.Group;
 import ai_ying.vo.GroupChat;
 import ai_ying.vo.GroupMember;
+import andysearch.dao.RestaurantDao;
+import andysearch.dao.impl.RestaurantDaoImpl;
 import andysearch.vo.Restaurant;
+import jessey.vo.Review;
 import member.vo.Member;
 
 public class GroupServiceImpl implements GroupService {
 	private GroupDao groupDao;
+	private RestaurantDao restaurantDao;
 
 	public GroupServiceImpl() throws NamingException {
 		groupDao = new GroupDaoImpl();
+		restaurantDao = new RestaurantDaoImpl();
 	}
 
 	@Override // 建立揪團
@@ -146,5 +151,59 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<Restaurant> getRestaurantList() {
 		return groupDao.selectAllRestaurant();
+	}
+
+	@Override // 取得餐廳評論
+	public Review getRestaurantReview(Review review) {
+		if (groupDao.selectRestaurantById(review.getRestaurantId()) == null) {
+			return null;
+		}
+		if (groupDao.selectMemberByUsername(review.getReviewerNickname()) == null) {
+			return null;
+		}
+		return groupDao.selectRestaurantReview(review);
+	}
+
+	@Override // 新增或更新評論
+	public String sendRestaurantReview(Review review) {
+		if (groupDao.selectRestaurantById(review.getRestaurantId()) == null) {
+			return "該餐廳不存在";
+		}
+		if (groupDao.selectMemberByUsername(review.getReviewerNickname()) == null) {
+			System.out.println(review.getReviewerNickname());
+			return "該會員不存在";
+		}
+		if (getRestaurantReview(review)==null) {
+			int result = groupDao.insertReview(review);
+			int totalReviews = groupDao.getTotalReviewSum(review.getRestaurantId());
+			if (totalReviews==-1) {
+				return "統計評論總數錯誤";
+			}
+			int totalScores = groupDao.getTotalScoresSum(review.getRestaurantId());
+			if (totalScores==-1) {
+				return "統計評論總分錯誤";
+			}
+			int update = restaurantDao.updateRestReviewAndScores(review.getRestaurantId(),totalReviews,totalScores);
+			if (update==-1) {
+				return "更新餐廳評論錯誤";
+			}
+			return result > 0 ? null : "新增評論失敗";
+		}
+		else {
+			int result = groupDao.updateReview(review);
+			int totalReviews = groupDao.getTotalReviewSum(review.getRestaurantId());
+			if (totalReviews==-1) {
+				return "統計評論總數錯誤";
+			}
+			int totalScores = groupDao.getTotalScoresSum(review.getRestaurantId());
+			if (totalScores==-1) {
+				return "統計評論總分錯誤";
+			}
+			int update = restaurantDao.updateRestReviewAndScores(review.getRestaurantId(),totalReviews,totalScores);	
+			if (update==-1) {
+				return "更新餐廳評論錯誤";
+			}
+			return result > 0 ? null : "更新評論失敗";
+		}
 	}
 }

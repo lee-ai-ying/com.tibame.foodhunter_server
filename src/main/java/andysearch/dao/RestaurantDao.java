@@ -12,5 +12,5 @@ public interface RestaurantDao {
 	//  預先載入10家餐廳
 	List<Restaurant> preLoadRestaurant();
 	
-	
+	Integer updateRestReviewAndScores(Integer restaurant_id, Integer total_review, Integer total_scores);
 }
