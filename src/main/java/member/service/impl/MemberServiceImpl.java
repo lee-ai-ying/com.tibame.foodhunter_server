@@ -228,4 +228,10 @@ public class MemberServiceImpl implements MemberService {
 		return memberDao.selectByMessage(member);
 	}
 
+	@Override
+	public String getTokenByMember(Member member) {
+		
+		return memberDao.selectToken(member);
+	}
+
 }

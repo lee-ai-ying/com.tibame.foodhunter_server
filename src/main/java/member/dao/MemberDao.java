@@ -24,4 +24,5 @@ List<Member> selectByRoomId(Member member);
 List<Member> selectByRoomId2(Member member);
 int insertmessage(Member member);
 List<Member> selectByMessage(Member member);
+String selectToken(Member member);
 }
