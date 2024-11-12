@@ -3,6 +3,7 @@ package sharon.vo;
 import java.sql.Date;
 
 public class Group {
+	private int groupId;
     private String groupName;
     private String restaurantName;
     private String restaurantAddress;
@@ -10,6 +11,13 @@ public class Group {
     private Date groupDate;
     private int memberId;
 
+	public int getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
+	
     public String getGroupName() {
         return groupName;
     }
@@ -63,4 +71,5 @@ public class Group {
                "  memberId=" + memberId + "\n" +
                "}";
     }
+
 }

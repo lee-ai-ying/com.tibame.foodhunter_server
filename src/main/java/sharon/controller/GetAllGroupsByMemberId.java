@@ -57,6 +57,7 @@ public class GetAllGroupsByMemberId extends HttpServlet {
                     // 將每個群組資料加入陣列
                     for (Group group : groups) {
                         JsonObject groupObj = new JsonObject();
+                        groupObj.addProperty("group_id", group.getGroupId());
                         groupObj.addProperty("name", group.getGroupName());
                         groupObj.addProperty("restaurant_name", group.getRestaurantName());
                         groupObj.addProperty("address", group.getRestaurantAddress());
