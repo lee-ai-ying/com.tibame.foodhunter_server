@@ -56,19 +56,18 @@ public class SendMessageController  extends HttpServlet{
 		Gson gson = new Gson();
 		Member member = gson.fromJson(req.getReader(), Member.class);
 		String msg = member.getMessage();
-		Notification notification = Notification.builder().setTitle(service.getinfo(member).getNickname()).setBody(msg).build();
-		Message message = Message.builder().setNotification(notification).putData("data", msg)
-				.setToken(service.getTokenByMember(member)).build();
-		try {
-			FirebaseMessaging.getInstance().send(message);
+		try {			
 			String errMsg = service.sendMessage(member);
 			JsonObject respBody = new JsonObject();
 			respBody.addProperty("result",errMsg == null);
 			respBody.addProperty("errMsg", errMsg);
 			if(errMsg == null) {
 				send = true;
-			respBody.addProperty("send", send);
-	
+				respBody.addProperty("send", send);
+				Notification notification = Notification.builder().setTitle(service.getinfo(member).getNickname()).setBody(msg).build();
+				Message message = Message.builder().setNotification(notification).putData("data", msg)
+						.setToken(service.getTokenByMember(member)).build();
+				FirebaseMessaging.getInstance().send(message);
 			}
 			resp.setCharacterEncoding("UTF-8");
 			resp.getWriter().write(respBody.toString());

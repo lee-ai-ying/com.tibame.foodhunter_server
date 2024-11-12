@@ -116,10 +116,14 @@ public class GroupServiceImpl implements GroupService {
 			return "該會員不存在";
 		}
 		if (groupDao.selectTokenByUsername(fcmToken.getUsername()) != null) {
-			return "該token已註冊";
+			int result = groupDao.updateFcmToken(fcmToken);
+			return result > 0 ? null : "更新fcm失敗";	
+			//return "該token已註冊";
 		}
-		int result = groupDao.insertFcmToken(fcmToken);
-		return result > 0 ? null : "註冊fcm失敗";
+		else {
+			int result = groupDao.insertFcmToken(fcmToken);
+			return result > 0 ? null : "註冊fcm失敗";			
+		}
 	}
 
 	@Override
