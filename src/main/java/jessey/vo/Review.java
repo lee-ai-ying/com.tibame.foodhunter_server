@@ -23,7 +23,7 @@ public class Review {
 	};
 
 	public Review(Integer reviewId, Integer reviewer, Integer restaurantId, Integer rating , String comments, Timestamp reviewDate, Integer thumbsUp,
-			Integer thumbsDown, Integer priceRangeMax, Integer priceRangeMin, String email, Integer serviceCharge) {
+			Integer thumbsDown, Integer priceRangeMax, Integer priceRangeMin, Integer serviceCharge) {
 		this.reviewId = reviewId;
 		this.reviewer = reviewer;
 		this.restaurantId = restaurantId;

@@ -21,4 +21,5 @@ public interface MemberService {
 	List<Member> getRoomId2(Member member);
 	String sendMessage(Member member);
 	List<Member> getMessage(Member member);
+	String getTokenByMember(Member member);
 }

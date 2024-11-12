@@ -155,7 +155,7 @@ public class MemberDaoImpl implements MemberDao {
 	}
 	@Override
 	public Member selectByUserdata(Member member) {
-		String sql = "select * from member where  username = ?";
+		String sql = "select member_id, username, password, nickname, email, phone, registrationdate, profileimage, gender, DATE_FORMAT(birthday, '%Y/%m/%d') birthday from member where  username = ?";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, member.getUsername());
 			try (ResultSet rs = pstmt.executeQuery()) {
@@ -168,7 +168,7 @@ public class MemberDaoImpl implements MemberDao {
 					member.setPhone(rs.getString("phone"));
 					member.setRegistrationdate(rs.getTimestamp("registrationdate"));
 					member.setGender(rs.getString("gender"));
-					member.setBirthday(rs.getTimestamp("birthday"));
+					member.setBirthday2(rs.getString("birthday"));
 					return member;
 				}
 			}
@@ -415,6 +415,25 @@ public class MemberDaoImpl implements MemberDao {
 		}
 
 		return members.isEmpty() ? null : members; // 如果沒找到資料則返回 null，否則返回列表
+	}
+
+	@Override
+	public String selectToken(Member member) {
+		String sql = "SELECT `token` FROM `fcm_token` WHERE `member_id`=(SELECT `member_id` FROM `member` WHERE `username` = ?) AND `member_id` IN (SELECT F1.`friend_id2` FROM `friend` AS F1 JOIN `friend` AS F2 ON F1.`friend_id1`=F2.`friend_id2` WHERE F1.`friend_id2`=F2.`friend_id1` AND F1.`friend_id1`=(SELECT `member_id` FROM `member` WHERE `username` =?));";
+		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setString(1, member.getReceiver_id());
+			pstmt.setString(2, member.getMessage_id());
+			try (ResultSet rs = pstmt.executeQuery();) {
+				if (rs.next()) {
+					return rs.getString("token");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 }
