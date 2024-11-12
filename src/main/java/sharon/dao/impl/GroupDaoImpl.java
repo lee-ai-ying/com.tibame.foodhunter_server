@@ -36,6 +36,7 @@ public class GroupDaoImpl implements GroupDao {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Group group = new Group();
+                    group.setGroupId(rs.getInt("group_id"));
                     group.setGroupName(rs.getString("name"));
                     group.setRestaurantName(rs.getString("restaurant_name"));
                     group.setRestaurantAddress(rs.getString("address"));
