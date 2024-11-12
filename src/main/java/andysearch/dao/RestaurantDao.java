@@ -13,4 +13,8 @@ public interface RestaurantDao {
 	List<Restaurant> preLoadRestaurant();
 	
 	Integer updateRestReviewAndScores(Integer restaurant_id, Integer total_review, Integer total_scores);
+
+	
+	// 以餐廳ID搜尋
+	Restaurant selectByRestId(Integer restaurant_id);
 }

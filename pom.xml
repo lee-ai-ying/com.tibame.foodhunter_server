@@ -14,6 +14,11 @@
 			<artifactId>firebase-admin</artifactId>
 			<version>9.4.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.ron</groupId>
+			<artifactId>ServerConnect_Web</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
