@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MulticastMessage;
@@ -51,15 +52,14 @@ public class SendMessageController extends HttpServlet {
 		String body = jsonObject.get("body").getAsString();
 		String data = jsonObject.get("data").getAsString();
 		GroupChat groupChat = gson.fromJson(data, GroupChat.class);
-		Notification notification = Notification.builder().setTitle(title).setBody(body).build();
-		MulticastMessage message = MulticastMessage.builder().setNotification(notification).putData("data", "")
-				.addAllTokens(service.getTokens(groupChat.getGroupId())).build();
 		try {
-			// BatchResponse batchResponse =
-			FirebaseMessaging.getInstance().sendEachForMulticast(message);
-			// System.out.println(batchResponse.getSuccessCount() + " messages were sent successfully");
 			JsonObject result = new JsonObject();
 			result.addProperty("result", gson.toJson(service.sendMessage(groupChat)));
+			Notification notification = Notification.builder().setTitle(title).setBody(body).build();
+			MulticastMessage message = MulticastMessage.builder().setNotification(notification).putData("data", "group")
+					.addAllTokens(service.getTokens(groupChat.getGroupId())).build();
+			BatchResponse batchResponse = FirebaseMessaging.getInstance().sendEachForMulticast(message);
+			System.out.println(batchResponse.getSuccessCount() + " messages were sent successfully");
 			PrintWriter out = resp.getWriter();
 			out.println(result.toString());
 		} catch (FirebaseMessagingException e) {

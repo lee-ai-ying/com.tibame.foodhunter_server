@@ -74,4 +74,6 @@ public interface GroupDao {
 
 	// 計算total_scores
 	int getTotalScoresSum(int restaurantId);
+
+	int updateFcmToken(FcmToken fcmToken);
 }
