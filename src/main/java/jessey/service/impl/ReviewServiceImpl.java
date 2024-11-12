@@ -32,54 +32,75 @@ public class ReviewServiceImpl implements ReviewService {
 	public boolean updateReview(Review review) {
 		boolean success = false;
 		try {
-			System.out.println("開始更新評論 - " + ",ID: " + review.getReviewId() + ",Reviewer: " + review.getReviewer()
-					+ ",Comments: " + review.getComments());
-			Review existingReview = reviewDao.getReviewById(review.getReviewId());
+	        // 先檢查是否有reviewId
+	        if (review.getReviewId() == null) {
+	            System.out.println("未提供評論ID，無法更新評論");
+	            return false;
+	        }
 
-			if (existingReview == null) {
-				System.out.println("找不到要更新的評論，ID: " + review.getReviewId());
-				return false;
-			}
+	        // 獲取現有評論
+	        Review existingReview = reviewDao.getReviewById(review.getReviewId());
+	        
+	        // 檢查評論是否存在
+	        if (existingReview == null) {
+	            System.out.println("找不到要更新的評論，ID: " + review.getReviewId());
+	            return false;
+	        }
 
-			// 複製不應該被更新的欄位
-			review.setReviewer(existingReview.getReviewer()); // 保持原發布者
-			review.setRestaurantId(existingReview.getRestaurantId()); // 保持原餐廳ID
-			review.setReviewDate(existingReview.getReviewDate()); // 保持原發布時間
-			review.setRating(existingReview.getRating()); // 保持原星星數
+	        // 驗證評論者是否為原作者
+	        if (!existingReview.getReviewer().equals(review.getReviewer())) {
+	            System.out.println("非原評論者，無權更新評論，ID: " + existingReview.getReviewId());
+	            return false;
+	        }
 
-			if (review.getThumbsUp() == null) {
-				review.setThumbsUp(existingReview.getThumbsUp()); // 保持原按讚數
-			}
+	        System.out.println("開始更新評論 - " + "ID: " + existingReview.getReviewId() 
+	            + ", Reviewer: " + existingReview.getReviewer()
+	            + ", 原評論內容: " + existingReview.getComments()
+	            + ", 新評論內容: " + review.getComments());
 
-			if (review.getThumbsDown() == null) {
-				review.setThumbsDown(existingReview.getThumbsDown()); // 保持原倒讚數
-			}
-			review.setPriceRangeMax(existingReview.getPriceRangeMax()); // 保持原價格區間、服務費
-			review.setPriceRangeMin(existingReview.getPriceRangeMin());
-			review.setServiceCharge(existingReview.getServiceCharge());
+	        // 建立更新用的評論物件，使用原評論的所有資料
+	        Review updatedReview = new Review();
+	        
+	        // 從原評論複製所有欄位（保護不變動的資料）
+	        updatedReview.setReviewId(existingReview.getReviewId());          // 保持原評論ID
+	        updatedReview.setReviewer(existingReview.getReviewer());         // 保持原評論者
+	        updatedReview.setRestaurantId(existingReview.getRestaurantId()); // 保持原餐廳ID
+	        updatedReview.setReviewDate(existingReview.getReviewDate());     // 保持原評論日期
+	        updatedReview.setRating(existingReview.getRating());            // 保持原評分
+	        updatedReview.setThumbsUp(existingReview.getThumbsUp());        // 保持原按讚數
+	        updatedReview.setThumbsDown(existingReview.getThumbsDown());    // 保持原倒讚數
+	        updatedReview.setPriceRangeMax(existingReview.getPriceRangeMax()); // 保持原價格區間
+	        updatedReview.setPriceRangeMin(existingReview.getPriceRangeMin());
+	        updatedReview.setServiceCharge(existingReview.getServiceCharge()); // 保持原服務費
+	        
+	        // 只更新評論內容
+	        updatedReview.setComments(review.getComments());                 // 允許更新評論內容
 
-			// 1. 更新評論主體
-			Integer result = reviewDao.updateReview(review);
-			if (result <= 0) {
-				throw new RuntimeException("更新失敗");
-			}
-
-			System.out.println("成功更新評論基本資訊，ID: " + review.getReviewId());
-
-			// 2. 重新獲取更新後的評論
-			Review updatedReview = reviewDao.getReviewById(review.getReviewId());
-			System.out.println("評論更新完成 ");
-
-			success = true;
-			System.out.println("完成評論更新流程");
-
-		} catch (Exception e) {
-			System.err.println("更新評論過程中發生錯誤: " + e.getMessage());
-			e.printStackTrace();
-		}
-
-		return success;
-	}// throw new UnsupportedOperationException("Not implemented yet");
+	        // 執行更新操作
+	        Integer result = reviewDao.updateReview(updatedReview);
+	        
+	        if (result <= 0) {
+	            throw new RuntimeException("更新失敗");
+	        }
+	        
+	        System.out.println("成功更新評論，ID: " + existingReview.getReviewId());
+	        
+	        // 7. 重新獲取更新後的評論以確認
+	        Review confirmUpdate = reviewDao.getReviewById(existingReview.getReviewId());
+	        if (confirmUpdate != null) {
+	            System.out.println("評論更新確認完成，新評論內容: " + confirmUpdate.getComments());
+	            success = true;
+	        }
+	        
+	        System.out.println("完成評論更新流程");
+	        
+	    } catch (Exception e) {
+	        System.err.println("更新評論過程中發生錯誤: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    
+	    return success;
+	}
 
 	@Override
 	public Review getReviewById(int reviewId) {
@@ -92,6 +113,7 @@ public class ReviewServiceImpl implements ReviewService {
 				System.out.println("評論內容: " + review.getComments());
 				System.out.println("評論者: " + review.getReviewerNickname());
 				System.out.println("餐廳: " + review.getRestaurantName());
+				System.out.println("評分: " + review.getRating());
 
 			} else {
 				System.out.println("Service層找不到評論，ID: " + reviewId);
