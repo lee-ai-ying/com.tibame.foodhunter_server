@@ -155,7 +155,7 @@ public class MemberDaoImpl implements MemberDao {
 	}
 	@Override
 	public Member selectByUserdata(Member member) {
-		String sql = "select * from member where  username = ?";
+		String sql = "select member_id, username, password, nickname, email, phone, registrationdate, profileimage, gender, DATE_FORMAT(birthday, '%Y/%m/%d') birthday from member where  username = ?";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, member.getUsername());
 			try (ResultSet rs = pstmt.executeQuery()) {
@@ -168,7 +168,7 @@ public class MemberDaoImpl implements MemberDao {
 					member.setPhone(rs.getString("phone"));
 					member.setRegistrationdate(rs.getTimestamp("registrationdate"));
 					member.setGender(rs.getString("gender"));
-					member.setBirthday(rs.getTimestamp("birthday"));
+					member.setBirthday2(rs.getString("birthday"));
 					return member;
 				}
 			}

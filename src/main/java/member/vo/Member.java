@@ -23,6 +23,15 @@ private String phone;
 private String email;
 private String gender;
 private Timestamp birthday;
+private String birthday2;
+
+public String getBirthday2() {
+	return birthday2;
+}
+
+public void setBirthday2(String birthday2) {
+	this.birthday2 = birthday2;
+}
 private String profileImageBase64;
 private InputStream profileImageInputStream;
 private String friend;
