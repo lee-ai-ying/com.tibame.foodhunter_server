@@ -37,43 +37,32 @@ public class SendMessageController  extends HttpServlet{
 
 	@Override
 	protected void doPost(HttpServletRequest req,HttpServletResponse resp) throws ServletException, IOException{
-//		req.setCharacterEncoding("UTF-8");
-//		boolean send = false;
-//		Gson gson =new Gson();
-//		Member member = gson.fromJson(req.getReader(),Member.class);
-//		String errMsg = service.sendMessage(member);
-//		JsonObject respBody = new JsonObject();
-//		respBody.addProperty("result",errMsg == null);
-//		respBody.addProperty("errMsg", errMsg);
-//		if(errMsg == null) {
-//			send = true;
-//		respBody.addProperty("send", send);
-//
-//		}
-//		resp.setCharacterEncoding("UTF-8");
-//		resp.getWriter().write(respBody.toString());
+
 		boolean send = false;
 		Gson gson = new Gson();
 		Member member = gson.fromJson(req.getReader(), Member.class);
 		String msg = member.getMessage();
+		String errMsg = service.sendMessage(member);
+		JsonObject respBody = new JsonObject();
+		respBody.addProperty("result",errMsg == null);
+		respBody.addProperty("errMsg", errMsg);
+		if(errMsg == null) {
+			send = true;
+			respBody.addProperty("send", send);}
 		try {			
-			String errMsg = service.sendMessage(member);
-			JsonObject respBody = new JsonObject();
-			respBody.addProperty("result",errMsg == null);
-			respBody.addProperty("errMsg", errMsg);
-			if(errMsg == null) {
-				send = true;
-				respBody.addProperty("send", send);
+				
 				Notification notification = Notification.builder().setTitle(service.getinfo(member).getNickname()).setBody(msg).build();
+				String token = service.getTokenByMember(member);
+						if(!token.isBlank()) {
 				Message message = Message.builder().setNotification(notification).putData("data", msg)
-						.setToken(service.getTokenByMember(member)).build();
+						.setToken(token).build();
 				FirebaseMessaging.getInstance().send(message);
-			}
-			resp.setCharacterEncoding("UTF-8");
-			resp.getWriter().write(respBody.toString());
+						}
 		} catch (FirebaseMessagingException e) {
 			e.printStackTrace();
 		}
+		resp.setCharacterEncoding("UTF-8");
+		resp.getWriter().write(respBody.toString());
 	}
 	}
 
