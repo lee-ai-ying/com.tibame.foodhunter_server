@@ -436,7 +436,7 @@ public class PostDaoImpl implements PostDao {
                 post.setPublisherProfileImage(profileImage);
 
                 // 加載照片
-                loadPhotosForPost(conn, post);
+                loadPhotosForPostOnlyOne(conn, post);
                 results.add(post);
             }
             return results;
@@ -476,4 +476,25 @@ public class PostDaoImpl implements PostDao {
 	        return null;
 	    }
 	}
+	
+	private void loadPhotosForPostOnlyOne(Connection conn, Post post) throws SQLException {
+        try (PreparedStatement photoStmt = conn.prepareStatement(PHOTO_SQL)) {
+            photoStmt.setInt(1, post.getPostId());
+            ResultSet photoRs = photoStmt.executeQuery();
+            if (photoRs.next()) {
+                PostPhoto photo = new PostPhoto();
+                photo.setPostPhotoId(photoRs.getInt("post_photo_id"));
+                photo.setPostId(photoRs.getInt("post_id"));
+                // 直接讀取為 byte[]
+                byte[] photoBytes = photoRs.getBytes("photo_file");
+                photo.setPhotoFile(photoBytes);
+                photo.setCreatedTime(photoRs.getTimestamp("created_time"));
+                post.addPhoto(photo);
+            }
+        }
+    }
+
+
+
+
 }
