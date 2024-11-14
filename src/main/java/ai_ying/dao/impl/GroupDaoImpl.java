@@ -456,7 +456,7 @@ public class GroupDaoImpl implements GroupDao {
 
 	@Override
 	public int updateFcmToken(FcmToken fcmToken) {
-		String sql = "UPDATE `fcm_token `SET `token` = ? WHERE `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?);";
+		String sql = "UPDATE `fcm_token` SET `token` = ? WHERE `member_id` = (SELECT `member_id` FROM `member` WHERE `username` = ?);";
 		try (Connection conn = ds.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setString(1, fcmToken.getFcmToken());
 			pstmt.setString(2, fcmToken.getUsername());
